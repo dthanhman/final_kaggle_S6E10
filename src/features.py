@@ -9,7 +9,7 @@ Các bậc cộng dồn (step N gồm mọi bậc <= N), đúng như khi thi:
   5  + tra cứu theo cả bộ điểm dịch vụ trên dữ liệu gốc
   6  + feature nghiệp vụ: tổng / hiệu delay, số điểm 0, thống kê điểm, chỉ số nhóm dịch vụ
 teachers=True: thêm 3 teacher khác loại (CatBoost, logistic, LightGBM chỉ dùng điểm + category), đều chỉ thấy nhãn
-của dữ liệu gốc. Bộ feature của model thi `A_lgb_v1` = step 4 + teachers.
+của dữ liệu gốc. Bộ feature của model thi `A_lgb_v2` = step 4 + teachers (`A_lgb_v1` cùng công thức nhưng có lỗi đảo cột FD/Age).
 
 Mọi feature trong build_static() không dùng nhãn của dữ liệu cuộc thi nên tính một lần trên train + test.
 Target encoding dùng nhãn nên chỉ tính trong fold (add_te).
@@ -74,7 +74,7 @@ def extra_teachers(A, o, X, n_jobs=4):
 
     yo = o[TARGET].values
     cb = CatBoostClassifier(iterations=1500, learning_rate=0.05, depth=6, random_seed=123, verbose=0,
-                            thread_count=n_jobs, cat_features=CAT_COLS)
+                            thread_count=n_jobs, cat_features=CAT_COLS, allow_writing_files=False)
     cb.fit(o[FEATURES], yo)
     X["orig_teacher_cb"] = cb.predict_proba(A[FEATURES])[:, 1].astype(np.float32)
 

@@ -18,10 +18,16 @@
 │   ├── blend.py       # blend / stack LR trên OOF
 │   ├── submit.py      # tạo và kiểm tra file nộp
 │   └── make_folds.py  # đã chạy một lần để tạo data/folds.csv
-├── exp/               # các thí nghiệm E0–E7, xem exp/README.md
-├── results/           # bảng kết quả (csv) do script sinh ra
-└── reports/figures/   # hình cho báo cáo
+├── exp/               # các thí nghiệm, xem exp/README.md
+│   ├── E0_setup.py / .ipynb, E1_eda.py / .ipynb, …   # mỗi mục: script (.py) và notebook đã chạy (.ipynb)
+│   ├── kaggle/        # phần chạy trên Kaggle (E2_lgb.py, E3_models.py)
+│   ├── competition/   # code gốc khi thi (lưu tra cứu) + reproduce_final.py tái tạo file nộp
+│   └── tools/         # py2nb.py, kaggle_bundle.py, build_competition_log.py
+├── results/           # bảng kết quả: E0_*.csv, E1_*.csv, E2_lr.csv, E2_lgb/, E3_models/, competition_*.csv
+└── reports/figures/   # hình cho báo cáo: E0_*.png, E1_*.png, …
 ```
+
+Không commit (tạo lại được): `data/` (trừ `folds.csv`), `oof/`, `submissions/`, `*.npy`, `exp/kaggle/build/`.
 
 ## Cài đặt
 
