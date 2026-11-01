@@ -1,0 +1,27 @@
+# Dữ liệu (tải bằng Kaggle CLI, xem data/README.md); chỉ commit folds.csv
+data/*
+!data/README.md
+!data/folds.csv
+
+# Dự đoán, model, bài nộp
+oof/
+submissions/
+*.npy
+*.npz
+*.pt
+*.pkl
+*.joblib
+catboost_info/
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+.env
+
+# Hệ điều hành / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

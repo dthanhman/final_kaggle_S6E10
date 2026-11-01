@@ -1,0 +1,12 @@
+numpy
+pandas
+scipy
+scikit-learn
+lightgbm==4.6.0  # 4.7.0 crash trên Windows khi import sau scikit-learn
+matplotlib
+xgboost
+catboost
+optuna
+jupyter
+openpyxl
+kaggle
