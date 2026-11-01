@@ -34,7 +34,7 @@ E6 tổng hợp lại những kết quả này.
 | E2 | Tiền xử lý, tạo và chọn feature | 04 | bộ feature của `A_lr` (0,95974) và `A_lgb` (0,96089); ghép dòng gốc 18/10 | "bậc thang" từ LR baseline 0,9217, mỗi bậc thêm một bước | xong |
 | E3 | Huấn luyện, so sánh model | 07, 08 | LightGBM, LR, kNN, TabM, FM, FT-Transformer, TabPFN, Q-FT, GPT-2 | Decision Tree, Random Forest, Naive Bayes, SVM, MLP; bias / variance; learning curve | xong |
 | E4 | Tinh chỉnh siêu tham số | 09 | dò stacker (v5), lưới hệ số theo họ (v16), số epoch Q-FT | Grid / Random / Optuna cùng số lần thử trên LightGBM | xong |
-| E5 | Kết hợp model | 10 | stacking chỉ model của nhóm (0,96162), stacking với pool công khai, FWLS, Q-FT | averaging, weighted, rank, blending, stacking trên OOF của nhóm | đang làm |
+| E5 | Kết hợp model | 10 | stacking chỉ model của nhóm (0,96162), stacking với pool công khai, FWLS, Q-FT | averaging, weighted, rank, blending, stacking trên OOF của nhóm | xong |
 | E6 | Đánh giá cuối, chọn bài nộp | 05, 11 | 36 bài nộp, chọn 2 bài cuối, public và private | ROC, AUC theo nhóm khách, lỗi tự tin; nhiễu public LB | chưa |
 | E7 | Triển khai (tuỳ chọn) | 11 | – | demo Streamlit | chưa |
 

@@ -1,0 +1,36 @@
+order,k,added,cv_auc
+AUC riêng,1,A_qft2_v2avg,0.9612977411591865
+AUC riêng,2,A_qft2_v2,0.9612826269004042
+AUC riêng,3,A_qft2_v2s7,0.9612973605153681
+AUC riêng,4,A_lgb_v1,0.9615526228076337
+AUC riêng,5,quan_cat_dual_teacher_v4,0.9615825288204667
+AUC riêng,6,quan_xgb_dual_teacher_v4,0.9615867630825353
+AUC riêng,7,A_lgb_v2,0.9615845060957096
+AUC riêng,8,quan_xgb_safe_teacher_v4,0.9615836406808366
+AUC riêng,9,A_lgb_wper3_v1,0.9615937615419868
+AUC riêng,10,A_ftt_v1,0.9615876523274813
+AUC riêng,11,A_glr_v1,0.9616034697596453
+AUC riêng,12,A_lr_v1,0.9616080665053446
+AUC riêng,13,A_lr_v2,0.9616145046063067
+AUC riêng,14,A_lgb_origrow_v1,0.9616216370323184
+AUC riêng,15,A_lgb_noorig_v1,0.9616205452193389
+AUC riêng,16,A_tabm_v1,0.9616164373088016
+AUC riêng,17,A_kozy_v1,0.9616138723189075
+AUC riêng,18,quan_xgb_original_aug_v4,0.9616153776362085
+AUC riêng,19,A_kozy_raw_v1,0.9616166398106178
+AUC riêng,20,A_kozy_prior_v1,0.9616158678205555
+AUC riêng,21,B_realmlp_v1,0.961614906100404
+AUC riêng,22,A_fm_v1,0.9616148269620487
+AUC riêng,23,A_gptc_v1,0.9616195061818171
+AUC riêng,24,A_knn_v2,0.9616193008160882
+AUC riêng,25,A_knn_v1,0.961618839030831
+tham lam theo stack,1,A_qft2_v2avg,0.9612977411591865
+tham lam theo stack,2,A_lgb_v1,0.9615600486853878
+tham lam theo stack,3,A_kozy_prior_v1,0.9615600905845986
+tham lam theo stack,4,A_glr_v1,0.9615798993842555
+tham lam theo stack,5,quan_xgb_original_aug_v4,0.9615811194690784
+tham lam theo stack,6,A_lr_v1,0.9615907407181457
+tham lam theo stack,7,A_lgb_noorig_v1,0.9615947700945631
+tham lam theo stack,8,quan_cat_dual_teacher_v4,0.9616169249686012
+tham lam theo stack,9,A_kozy_raw_v1,0.9616181566828969
+tham lam theo stack,10,A_ftt_v1,0.9616132589863071

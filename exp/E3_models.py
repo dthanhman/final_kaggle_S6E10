@@ -458,8 +458,7 @@ lc_tab.round(6)
 
 # %% [markdown]
 # ## 4. Tương quan giữa các model
-# Tương quan rank (Spearman) giữa OOF của các model ở mục 2. Hai model có AUC gần nhau nhưng tương quan thấp thường
-# là cặp có ích khi stacking (E5).
+# Tương quan rank (Spearman) giữa OOF của các model ở mục 2. Mức đóng góp thật khi ghép các model được đo ở E5.
 
 # %%
 order = [n for n in allm["model"] if n not in ("decision_tree_full", "naive_bayes_gauss")]
@@ -485,10 +484,11 @@ P.save(fig, "E3_04_rank_corr")
 
 # %% [markdown]
 # **Nhận xét mục 4**
-# - Bốn model boosting tương quan rank 0,96–0,98 với nhau, nên ghép chúng lại khó thêm được thông tin.
-# - Các model khác loại tương quan với LightGBM thấp hơn: MLP 0,917, Random Forest 0,929, SVM RBF 0,901, LR 0,895,
-#   Naive Bayes 0,816. Trong số này MLP là ứng viên đáng chú ý cho stacking, vì AUC chỉ thấp hơn LightGBM 0,0024 trong
-#   khi tương quan thấp. E5 kiểm tra điều này.
+# - Bốn model boosting tương quan rank 0,96–0,98 với nhau. Các model khác loại tương quan với LightGBM thấp hơn: MLP
+#   0,917, Random Forest 0,929, SVM RBF 0,901, LR 0,895, Naive Bayes 0,816.
+# - Tương quan thấp không đủ để dự đoán model nào giúp được khi ghép. Ở E5 mục 4.1, ghép LightGBM với CatBoost tăng
+#   2,6×10⁻⁴ và với XGBoost tăng 2,2×10⁻⁴, trong khi MLP chỉ tăng 5×10⁻⁵ và các model yếu hơn làm giảm. Model được
+#   ghép cần vừa đủ mạnh vừa sai ở những dòng khác.
 
 # %% [markdown]
 # ## 5. Tóm tắt và quyết định
@@ -506,7 +506,7 @@ P.save(fig, "E3_04_rank_corr")
 # 1. Dùng LightGBM làm model chính để tinh chỉnh ở E4, vì AUC ngang XGBoost và CatBoost nhưng chạy nhanh hơn CatBoost
 #    khoảng 10 lần.
 # 2. Model đưa vào stacking được chọn theo mức đóng góp cho stacking (Δ khi bỏ ra, ổn định qua nhiều meta seed), không
-#    theo AUC riêng. Ưu tiên model khác loại với cây (mạng nơ-ron, model có tiền huấn luyện) như Q-FT. Áp dụng ở E5.
+#    theo AUC riêng hay theo tương quan. Áp dụng ở E5.
 # 3. Chỉ OOF sạch được đưa vào stacking (quy ước E0), kể cả với model đã dùng khi thi.
 #
 # **Đã thử nhưng không giữ**

@@ -1,0 +1,7 @@
+pool,method,auc_fold1_4
+E3,blending (LR fit trên fold 0),0.9588912097711151
+E3,stacking LR C=0.003 (nested),0.9588961303204382
+E3,TB logit,0.9560067295189432
+nhóm,blending (LR fit trên fold 0),0.9615667879692724
+nhóm,stacking LR C=0.003 (nested),0.9615684427107667
+nhóm,TB logit,0.9604423121800382
