@@ -39,7 +39,7 @@ Flight Distance / Age ở bản đầu; `src/features.py` là bản đã sửa.
 | `A_tfm_probe.py` | thử TabPFN với context lớn | `A_tabpfn_probe` 0,959990 (fold 0) | Kaggle GPU |
 
 Model của các thành viên khác (XGBoost / CatBoost có teacher từ dữ liệu gốc, RealMLP, model chuyên khách đi việc riêng)
-được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code nằm trong git repo làm việc cũ của nhóm: notebook `cs116.ipynb` (4 model XGBoost / CatBoost dùng dữ liệu gốc, 17/10), `B_realmlp_pytabkit.ipynb` và `B_personal_specialist_gbdt.ipynb` (18/10). Đã kiểm tra: XGBoost / CatBoost và RealMLP sạch (early stopping trên 10% tách từ phần train của fold); Dual-Specialist LightGBM dừng sớm trên fold đang chấm nên không đưa vào stack ở E3.
+được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code chép nguyên văn từ repo làm việc cũ vào `exp/competition/code/members/` (xem README ở đó: nguồn commit, cách làm từng model). Đã kiểm tra: XGBoost / CatBoost và RealMLP sạch (early stopping trên 10% tách từ phần train của fold); Dual-Specialist LightGBM dừng sớm trên fold đang chấm nên không đưa vào stack ở E3.
 
 **Stacking và chọn bài:**
 
