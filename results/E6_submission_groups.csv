@@ -1,0 +1,5 @@
+nhóm,số_bài,public_TB,public_max,private_TB,private_max
+model của nhóm,6,0.96018,0.96068,0.96104,0.96157
+stacking theo CV,5,0.96183,0.96184,0.96237,0.96239
+stacking trộn nhẹ,13,0.96185,0.96191,0.96238,0.96239
+trộn mạnh / dò public LB,12,0.96205,0.96221,0.96228,0.96237

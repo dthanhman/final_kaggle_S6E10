@@ -1,0 +1,7 @@
+cặp,A,B,tương quan rank,số dòng,chênh trên toàn bộ OOF,sd chênh,tỉ lệ đảo dấu
+hai bản stacking pool công khai,stack_v17b_qft15,stack_fw_p247,0.99968,60000,5.724738341483793e-06,2.3234974324239993e-05,0.394
+hai bản stacking pool công khai,stack_v17b_qft15,stack_fw_p247,0.99968,240000,5.724738341483793e-06,9.395387083367259e-06,0.278
+stacking công khai / stacking nhóm + foundation model,stack_v17b_qft15,stack_team_tfm,0.99213,60000,0.0004205843941307297,0.000112226200923832,0.0
+stacking công khai / stacking nhóm + foundation model,stack_v17b_qft15,stack_team_tfm,0.99213,240000,0.0004205843941307297,4.795401793891373e-05,0.0
+stacking công khai / LightGBM đơn,stack_v17b_qft15,A_lgb_v2,0.97601,60000,0.0013305920296615703,0.00019524213411590465,0.0
+stacking công khai / LightGBM đơn,stack_v17b_qft15,A_lgb_v2,0.97601,240000,0.0013305920296615703,7.97508308393679e-05,0.0

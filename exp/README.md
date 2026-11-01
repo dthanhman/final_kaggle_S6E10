@@ -35,7 +35,7 @@ E6 tổng hợp lại những kết quả này.
 | E3 | Huấn luyện, so sánh model | 07, 08 | LightGBM, LR, kNN, TabM, FM, FT-Transformer, TabPFN, Q-FT, GPT-2 | Decision Tree, Random Forest, Naive Bayes, SVM, MLP; bias / variance; learning curve | xong |
 | E4 | Tinh chỉnh siêu tham số | 09 | dò stacker (v5), lưới hệ số theo họ (v16), số epoch Q-FT | Grid / Random / Optuna cùng số lần thử trên LightGBM | xong |
 | E5 | Kết hợp model | 10 | stacking chỉ model của nhóm (0,96162), stacking với pool công khai, FWLS, Q-FT | averaging, weighted, rank, blending, stacking trên OOF của nhóm | xong |
-| E6 | Đánh giá cuối, chọn bài nộp | 05, 11 | 36 bài nộp, chọn 2 bài cuối, public và private | ROC, AUC theo nhóm khách, lỗi tự tin; nhiễu public LB | chưa |
+| E6 | Đánh giá cuối, chọn bài nộp | 05, 11 | 36 bài nộp, chọn 2 bài cuối, public và private | ROC, AUC theo nhóm khách, lỗi tự tin; nhiễu public LB | xong |
 | E7 | Triển khai (tuỳ chọn) | 11 | – | demo Streamlit | chưa |
 
 ## Thuật ngữ
