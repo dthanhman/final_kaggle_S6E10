@@ -28,7 +28,7 @@ FOLD_MD5 = "9b4ec081a927d21459a607937e6c562c"
 SMOKE = os.environ.get("SMOKE") == "1"
 N_JOBS = int(os.environ.get("N_JOBS", os.cpu_count() or 4))
 ON_KAGGLE = os.path.isdir("/kaggle/input")
-WORK = Path("/kaggle/working") if ON_KAGGLE else Path(__file__).resolve().parents[2] / "results" / "kaggle_E2_lgb"
+WORK = Path("/kaggle/working") if ON_KAGGLE else Path(os.environ.get("WORK", "results/kaggle_E2_lgb"))  # local: chạy từ gốc repo
 WORK.mkdir(parents=True, exist_ok=True)
 T0 = time.time()
 AGE, FD, DEP, ARR = NUM_COLS
