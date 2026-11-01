@@ -154,7 +154,7 @@ ax.set_xlim(0, 1)
 ax.xaxis.set_major_formatter(plt.matplotlib.ticker.PercentFormatter(1))
 ax.grid(axis="y", visible=False)
 ax.legend(ncol=6, loc="upper center", bbox_to_anchor=(0.45, 1.09))
-ax.set_title("Phân bố mức điểm của 13 cột dịch vụ (sắp theo tỉ lệ điểm 4-5)", pad=26)
+ax.set_title("Phân bố mức điểm của 13 cột dịch vụ (sắp theo tỉ lệ điểm 4–5)", pad=26)
 P.save(fig, "E1_02_score_distribution")
 
 # %% [markdown]
@@ -180,6 +180,7 @@ for j, col in enumerate(NUM_COLS):
                flierprops=dict(marker=".", markersize=2, markeredgecolor=P.INK_3, alpha=0.3))
     bx.set_yticks([])
     bx.set_xlabel("log1p(phút)" if is_delay else col)
+axes[0, 0].set_ylabel("số dòng")
 fig.tight_layout()
 P.save(fig, "E1_03_numeric_distribution")
 
@@ -280,6 +281,7 @@ for ax, col in zip(axes.flat, SCORE_COLS):
     ax.axhline(BASE, color=P.REF, lw=1, ls="--")
     ax.set_title(col, fontsize=9)
     ax.set_xticks(range(6))
+    ax.set_xlim(-0.6, 5.6)
     ax.set_ylim(0, 1)
     ax.grid(axis="x", visible=False)
 for ax in axes.flat[len(SCORE_COLS):]:
@@ -409,6 +411,7 @@ for ax, (a, b) in zip(axes, pairs_cat):
     ax.set_yticks(range(rate.shape[0]), rate.index)
     ax.set_xlabel(b)
     ax.set_ylabel(a)
+    ax.set_title(f"{a} × {b}", fontsize=10)
     ax.grid(False)
     for i in range(rate.shape[0]):
         for j in range(rate.shape[1]):
@@ -482,7 +485,7 @@ for lab, colr, name in [(0, P.NEG, "không hài lòng"), (1, P.POS, "hài lòng"
     axes[1].scatter(pc[idx][m, 0], pc[idx][m, 1], s=3, alpha=0.35, color=colr, label=name, linewidths=0)
 axes[1].set_xlabel(f"PC1 ({evr[0]:.0%})")
 axes[1].set_ylabel(f"PC2 ({evr[1]:.0%})")
-axes[1].set_title("Hai thành phần chính đầu (mẫu 20.000 dòng)")
+axes[1].set_title("Hai thành phần chính đầu (mẫu 20 nghìn dòng)")
 axes[1].legend(markerscale=4)
 fig.tight_layout()
 P.save(fig, "E1_10_pca")
@@ -501,7 +504,7 @@ for lab, colr, name in [(0, P.NEG, "không hài lòng"), (1, P.POS, "hài lòng"
     ax.scatter(emb[m, 0], emb[m, 1], s=5, alpha=0.6, color=colr, label=name, linewidths=0)
 ax.set_xticks([])
 ax.set_yticks([])
-ax.set_title("t-SNE trên 6.000 dòng ngẫu nhiên")
+ax.set_title("t-SNE trên 6 nghìn dòng ngẫu nhiên")
 ax.legend(markerscale=3)
 P.save(fig, "E1_11_tsne")
 
@@ -612,12 +615,12 @@ for k_, (df, colr, name) in enumerate([(orig, P.ORANGE, "gốc"), (train, P.BLUE
 axes[0].set_xticks(range(len(labels)), labels)
 axes[0].set_xlabel("Departure Delay (phút)")
 axes[0].set_ylabel("tỉ lệ dòng")
-axes[0].set_title("Delay đi: dữ liệu tổng hợp dồn về 0")
+axes[0].set_title("Departure Delay: dữ liệu gốc và train cuộc thi")
 axes[0].grid(axis="x", visible=False)
 axes[0].legend()
 axes[1].set_xlabel("Flight Distance")
 axes[1].set_ylabel("mật độ")
-axes[1].set_title("Flight Distance")
+axes[1].set_title("Flight Distance: dữ liệu gốc và train cuộc thi")
 axes[1].legend()
 fig.tight_layout()
 P.save(fig, "E1_12_original_vs_train")

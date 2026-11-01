@@ -4,7 +4,7 @@
 
 - Cuộc thi: [playground-series-s6e10](https://www.kaggle.com/competitions/playground-series-s6e10), bài toán phân loại nhị phân: dự đoán xác suất hành khách hài lòng.
 - Metric: **ROC AUC**.
-- Kết quả: **hạng 66 / ~3748 đội trên private LB** (AUC 0,96239), top ~1,8%; public LB 0,96190.
+- Kết quả: **hạng 66 / khoảng 3.748 đội trên private LB** (AUC 0,96239), khoảng top 1,8%; public LB 0,96190.
 
 ## Cấu trúc
 
@@ -19,7 +19,8 @@
 │   ├── submit.py      # tạo và kiểm tra file nộp
 │   └── make_folds.py  # đã chạy một lần để tạo data/folds.csv
 ├── exp/               # các thí nghiệm, xem exp/README.md
-│   ├── E0_setup.py / .ipynb, E1_eda.py / .ipynb, …   # mỗi mục: script (.py) và notebook đã chạy (.ipynb)
+│   ├── E0_setup.ipynb … E6_final.ipynb   # notebook đã chạy sẵn output, đọc từ đây
+│   ├── scripts/       # mã nguồn của từng notebook (E0_setup.py …), chuyển thành notebook bằng tools/py2nb.py
 │   ├── kaggle/        # phần chạy trên Kaggle (E2_lgb.py, E3_models.py, E4_tuning.py)
 │   ├── competition/   # code gốc khi thi (lưu tra cứu) + reproduce_final.py tái tạo file nộp
 │   └── tools/         # py2nb.py, kaggle_bundle.py, build_competition_log.py
@@ -28,7 +29,8 @@
 └── reports/figures/   # hình cho báo cáo: E0_*.png, E1_*.png, …
 ```
 
-Không commit (tạo lại được): `data/` (trừ `folds.csv`), `oof/`, `submissions/`, `*.npy`, `exp/kaggle/build/`.
+Không commit: `data/` (trừ `folds.csv`), `oof/`, `submissions/`, `*.npy`, `exp/kaggle/build/`. Các file OOF
+(`*.npy`) quá lớn để đưa lên repo; những phần cần chúng được ghi ở mục "Chạy" của `exp/README.md`.
 
 ## Cài đặt
 

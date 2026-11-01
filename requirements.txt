@@ -1,14 +1,17 @@
-numpy
-pandas
-scipy
-scikit-learn
+# Phiên bản dùng khi chạy các notebook trên máy cá nhân (Python 3.11).
+# Phần chạy trên Kaggle (exp/kaggle/) dùng môi trường có sẵn của Kaggle.
+numpy==1.26.4
+pandas==2.2.2
+scipy==1.13.1
+scikit-learn==1.9.1
 lightgbm==4.6.0  # 4.7.0 crash trên Windows khi import sau scikit-learn
-matplotlib
+matplotlib==3.11.2
 xgboost
 catboost
 optuna
 jupyter
+nbclient
 openpyxl
 kaggle
-streamlit
+streamlit==1.66.1
 pyarrow<20  # NumPy 1.x: pyarrow >= 20 cần NumPy 2

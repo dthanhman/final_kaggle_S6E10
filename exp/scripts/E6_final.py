@@ -129,7 +129,7 @@ subs.sort_values("private", ascending=False)[["ngày", "file", "nhóm", "public"
 #   trung bình thấp nhất trong các nhóm dùng stacking (0,96228). Hai nhóm stacking theo CV và stacking trộn nhẹ có public
 #   thấp hơn (0,96183 và 0,96185) nhưng private cao hơn (0,96237 và 0,96238).
 # - Trên 30 bài stacking và trộn, tương quan Spearman giữa public và private là −0,55. Nếu chọn bài theo public LB thì
-#   gần như chắc chắn chọn sai: bài có public cao nhất (slot 2, 0,96221) lại có private thấp nhất (0,96218).
+#   sẽ chọn sai: bài có public cao nhất (slot 2, 0,96221) lại có private thấp nhất (0,96218).
 # - Slot 1 đạt private cao nhất (0,96239), bằng `stack_fw_p247` nộp từ 15/10. Các cải tiến stacking sau đó (bỏ member
 #   Forge, FWLS, thêm Q-FT) đều nằm trong khoảng 0,96236–0,96239 trên private, tức là không thay đổi được kết quả
 #   cuối, đúng với dự đoán từ CV (mỗi cải tiến chỉ vài phần triệu).
@@ -223,8 +223,8 @@ if preds is not None:
         fpr, tpr, _ = roc_curve(y, pr)
         ax.plot(fpr, tpr, color=c, lw=1.6, label=f"{k}: AUC {roc_auc_score(y, pr):.5f}")
     ax.plot([0, 1], [0, 1], color=P.REF, lw=1, ls="--")
-    ax.set_xlabel("False positive rate")
-    ax.set_ylabel("True positive rate")
+    ax.set_xlabel("tỉ lệ dương tính giả (FPR)")
+    ax.set_ylabel("tỉ lệ dương tính thật (TPR)")
     ax.set_title("Đường ROC trên OOF")
     ax.legend(loc="lower right", fontsize=7.5)
     ins = ax.inset_axes([0.42, 0.32, 0.5, 0.38])
@@ -282,13 +282,13 @@ if preds is not None:
 # | Nhiễu public LB với hai bài gần giống nhau | độ lệch chuẩn 2,3×10⁻⁵, đảo thứ tự 39% số lần |
 # | Model cuối trên OOF | AUC 0,96222; hơn LightGBM đơn ở mọi nhóm khách; khó nhất là khách đi việc riêng (0,836) |
 #
-# **Quyết định (nhìn lại):**
-# 1. Chọn bài theo CV là đúng: bài theo CV đạt private cao nhất (0,96239), và private trung bình của các bài stacking
-#    theo CV cao hơn nhóm bài dò public LB 9×10⁻⁵.
-# 2. Giữ hai slot theo hai hướng khác nhau không làm mất gì, vì điểm cuối là điểm cao hơn của hai bài. Slot 2 không
-#    giúp lần này, nhưng che kịch bản đám đông trên public LB đúng.
-# 3. Từ khoảng 19/10, các thay đổi stacking chỉ còn vài phần triệu, nhỏ hơn nhiễu của cả public lẫn private. Thời
-#    gian sau mốc đó dành cho việc tìm model khác loại (Q-FT) có cơ sở hơn việc dò thêm stacker hay trộn file.
+# **Quyết định:**
+# 1. Bài chọn theo CV đạt private cao nhất (0,96239). Private trung bình của nhóm bài stacking theo CV cao hơn nhóm bài
+#    dò public LB 9×10⁻⁵. Với cuộc thi sau, nhóm sẽ chọn ít nhất một bài theo CV.
+# 2. Hai slot theo hai hướng khác nhau không làm giảm điểm cuối, vì điểm cuối là điểm private cao hơn của hai bài. Lần
+#    này slot 2 không giúp; slot này chỉ có ích nếu các file trộn của cộng đồng thật sự tốt hơn stacking trên private.
+# 3. Từ khoảng 19/10, các thay đổi stacking chỉ còn vài ×10⁻⁶, nhỏ hơn nhiễu của cả public lẫn private. Sau mốc đó,
+#    tìm model khác loại (như Q-FT) có cơ sở hơn dò thêm stacker hay trộn file.
 #
 # **Đã thử nhưng không giữ**
 #
@@ -301,23 +301,29 @@ if preds is not None:
 # | Slot 2 trộn theo cổng bất đồng, teacher 35% (h-blend) | 20/10 | 0,96206 | 0,96228 | thay bằng bản bám đám đông hơn |
 # | Slot 2 trộn 50% với file 0,96210 (mix50), thêm 10% TabPFN | 22/10, 25/10 | 0,96209 / 0,96211 | 0,96226 / 0,96225 | tiêm TabPFN: CV −1,6×10⁻⁵ đến −2,3×10⁻⁵, 0/5 fold |
 # | Slot 2 kéo về / đẩy ngược hướng stacking từ cụm 0,96213 (step20, step10, anti10) | 28/10 | 0,96210–0,96213 | 0,96219–0,96228 | thay bằng tâm các file dò public mới nhất |
-# | Slot 2 tâm 7 file dò public 0,96217–0,96225 (bài chọn cuối) | 31/10 | 0,96221 | 0,96218 | được chọn, nhưng private thấp nhất trong 30 bài |
 # | Đổi teacher trong công thức trộn (`A_teacher_swap.py`) | 21/10 | – | – | dấu của tác dụng phụ thuộc file nền; không dùng |
 # | Kéo file đám đông về trục LightGBM của stacker (`A_crowd_axis.py`) | 22/10 | – | – | tương quan giữa trục này và khác biệt của các file đám đông chỉ 0,1; không dựng file |
 # | Ước lượng OOF giả của file 0,96213 từ pool công khai | 31/10 | – | – | xấp xỉ quá thô (tương quan 0,994), không kết luận được |
 #
+# Một số hướng nhóm đã cân nhắc nhưng không làm: pseudo-label mềm trên tập test (một notebook công khai báo CV
+# +3×10⁻⁵ nhưng public LB −4×10⁻⁵, dấu hiệu rò rỉ), member train 10 fold (một thí sinh đo trên tập test giả chỉ tăng 1×10⁻⁵, và OOF 10 fold không ghép được với
+# `folds.csv`), model
+# truy xuất láng giềng như TabR hay ModernNCA (kNN đã cho ±0 ở E3), tự sinh feature bằng OpenFE, fine-tune foundation
+# model, và thêm các stacker phi tuyến khác ngoài LightGBM.
+#
 # ## Bài học từ các kết quả âm (E2–E6)
 #
-# 1. **Rò rỉ nhỏ vẫn đủ để chọn sai.** Early stopping trên fold đang chấm chỉ làm CV lệch khoảng 2×10⁻⁴ (E0), nhưng
-#    đó là cỡ chênh lệch giữa các phương án ở giai đoạn stacking. Hai model khi thi bị loại vì lý do này (E3).
-# 2. **Cùng một bước tiền xử lý có tác dụng khác nhau tuỳ model.** Mã hoá điểm thành one-hot tăng 0,027 với LR nhưng
-#    không đổi gì với LightGBM; ngược lại với feature chữ số (E2).
-# 3. **AUC riêng và tương quan không đủ để chọn member.** FT-Transformer mạnh nhưng không giúp stacking; CatBoost
-#    tương quan 0,97 với LightGBM lại giúp nhiều nhất (E3, E5). Cần đo trực tiếp mức đóng góp.
-# 4. **Khi pool đã bão hoà, phần lớn ý tưởng mới cho ±0.** Hơn 100 OOF công khai mới, feature phần dư, lát cắt, dòng
-#    gần trùng và nhiều model khác loại đều nằm trong ±5×10⁻⁶ (E3, E5). Chỉ Q-FT, một model khác hẳn cách học, còn
-#    thêm được thông tin.
-# 5. **Chọn cái tốt nhất trong nhiều lần thử trên cùng một tập thì kết quả bị lạc quan.** Điều này đúng với tinh chỉnh
-#    tham số (E4, thêm 2×10⁻⁴ đến 4×10⁻⁴) và với việc dò public LB (E6).
-# 6. **Public LB nhỏ nên nhiễu.** Chênh lệch dưới khoảng 5×10⁻⁵ không phân biệt được; tin CV trên toàn bộ train cho
-#    kết quả private tốt hơn mọi bài chọn theo public.
+# 1. Early stopping trên fold đang chấm chỉ làm CV lệch khoảng 2×10⁻⁴ (E0), nhưng đó là cỡ chênh lệch giữa các phương
+#    án ở giai đoạn stacking, nên đủ để chọn sai. Hai model khi thi bị loại vì lý do này (E3).
+# 2. Cùng một bước tiền xử lý có tác dụng khác nhau tuỳ model. Mã hoá điểm thành one-hot tăng 0,027 với LR nhưng gần
+#    như không đổi với LightGBM; feature chữ số thì ngược lại (E2).
+# 3. AUC riêng và tương quan không đủ để chọn member. FT-Transformer có AUC cao nhưng không giúp stacking, còn CatBoost
+#    tương quan 0,97 với LightGBM lại giúp nhiều nhất khi ghép với LightGBM (E3, E5). Nhóm đo trực tiếp mức đóng góp
+#    vào stacking.
+# 4. Khi pool đã có khoảng 250 OOF, phần lớn ý tưởng mới chỉ thay đổi trong ±5×10⁻⁶: hơn 100 OOF công khai mới,
+#    feature phần dư, lát cắt, dòng gần trùng và nhiều model khác loại (E3, E5). Q-FT là model duy nhất còn thêm được
+#    thông tin, có thể vì cách học khác hẳn model cây.
+# 5. Chọn cấu hình tốt nhất trong nhiều lần thử trên cùng một tập làm kết quả trên tập đó lạc quan. Hiện tượng này
+#    xuất hiện khi tinh chỉnh tham số (E4, thêm 2×10⁻⁴ đến 4×10⁻⁴) và khi dò public LB (E6).
+# 6. Public LB chỉ có khoảng 60 nghìn dòng nên chênh lệch dưới khoảng 5×10⁻⁵ không phân biệt được. Trong cuộc thi này,
+#    bài chọn theo CV trên toàn bộ train có private cao hơn mọi bài chọn theo public.

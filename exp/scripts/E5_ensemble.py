@@ -10,12 +10,12 @@
 # >
 # > | Ngày | Stack | CV | Ghi chú |
 # > | --- | --- | --- | --- |
-# > | 15/10 | `A_lgb` + `A_lr` (stack LR 2 member) | 0,96103 | +0,00008 so với LightGBM đơn |
+# > | 15/10 | `A_lgb` + `A_lr` (stack LR 2 member) | 0,96103 | +8×10⁻⁵ so với LightGBM đơn |
 # > | 15/10 | 251 OOF công khai, LR theo họ + LightGBM (`stack_fw_p247`) | 0,962218 | bài nộp slot 1, **private 0,96239** |
 # > | 19/10 | chỉ model nhóm tự train (10 model) | 0,96121 | |
-# > | 19/10 | 10 model nhóm + 15 foundation model công khai | 0,96180 | nhóm thêm +0,00016 so với 15 foundation model |
+# > | 19/10 | 10 model nhóm + 15 foundation model công khai | 0,96180 | nhóm thêm +1,6×10⁻⁴ so với 15 foundation model |
 # > | 19/10 | thêm model nhóm vào pool công khai đầy đủ | ±0 | pool công khai đã chứa thông tin đó |
-# > | 25/10 | stack công khai + Q-FT ×1,5 (`stack_v17_qft15`) | 0,962224 | qua cổng, 14/15 fold |
+# > | 25/10 | stack công khai + Q-FT ×1,5 (`stack_v17_qft15`) | 0,962224 | qua cổng, 14/15 fold; bài nộp dùng bản Q-FT trung bình 2 seed (`stack_v17b_qft15`) |
 # >
 # > Ở E3, stacking 25 OOF sạch của nhóm đạt 0,961619. Phần dưới so sánh các cách kết hợp trên chính bộ OOF đó và trên
 # > 12 model của E3, để kiểm tra lựa chọn stacking bằng LR trên logit của nhóm.
@@ -240,6 +240,10 @@ for ax, pool in zip(axes, POOLS):
     ax.axvline(0, color=P.REF, lw=1)
     ax.set_xlabel("Δ CV AUC so với member tốt nhất")
     ax.set_title(f"Bộ {pool} (member tốt nhất {best[pool]:.5f})")
+from matplotlib.patches import Patch  # noqa: E402
+fig.legend(handles=[Patch(color=P.BLUE, label="stacking (học trọng số, nested CV)"),
+                    Patch(color=P.ORANGE, label="trung bình / chọn member")],
+           loc="upper center", bbox_to_anchor=(0.5, 1.05), ncol=2)
 fig.tight_layout()
 P.save(fig, "E5_01_methods")
 
@@ -251,14 +255,15 @@ P.save(fig, "E5_01_methods")
 # - Chỉ lấy trung bình 5 member AUC cao nhất đã vượt member tốt nhất (+2,6×10⁻⁴ trên bộ E3, +2,9×10⁻⁴ trên bộ nhóm).
 #   Caruana tự chọn trọng số và cho kết quả tương tự (0,95887 và 0,96157), nhưng vẫn thấp hơn stacking LR khoảng
 #   4×10⁻⁵.
-# - Stacking LR cao nhất trên cả hai bộ: 0,958906 (+3,1×10⁻⁴ so với LightGBM) và 0,961619 (+3,2×10⁻⁴ so với Q-FT), ổn
-#   định giữa hai cách chia meta fold. Mức C từ 0,0003 đến 1 chỉ làm AUC thay đổi khoảng 1,4×10⁻⁵ đến 1,7×10⁻⁵, chuẩn hoá cột cũng
-#   không ảnh hưởng.
+# - Stacking LR đạt 0,958906 trên bộ E3 (+3,1×10⁻⁴ so với LightGBM) và 0,961619 trên bộ nhóm (+3,2×10⁻⁴ so với Q-FT),
+#   chênh không quá 2×10⁻⁵ giữa hai cách chia meta fold. Đổi C từ 0,0003 đến 1 làm AUC thay đổi không quá 1,7×10⁻⁵
+#   (bộ E3) và 1,4×10⁻⁵ (bộ nhóm); chuẩn hoá cột không ảnh hưởng.
 # - Blending (fit chỉ trên fold 0) gần như bằng stacking khi chấm trên cùng fold 1–4 (chênh 5×10⁻⁶ và 1×10⁻⁶). Stacker
 #   LR chỉ có 12–25 tham số nên 140 nghìn dòng của một fold đã đủ để ước lượng; lợi thế của stacking là dùng được toàn
 #   bộ dữ liệu để chấm và có thể chạy nhiều meta seed.
-# - Stacking bằng LightGBM thấp hơn LR và dao động mạnh giữa hai meta seed (bộ nhóm: 0,96149 và 0,96088). Trên OOF đã
-#   là xác suất của các model mạnh, meta model phi tuyến dễ overfit hơn là học được tương tác có ích.
+# - Stacking bằng LightGBM dao động mạnh giữa hai meta seed. Trên bộ E3, với meta fold seed 7 nó đạt 0,95903, cao hơn
+#   LR 1,1×10⁻⁴, nhưng với `folds.csv` lại thấp hơn LR 7×10⁻⁵. Trên bộ nhóm nó thấp hơn LR ở cả hai seed (0,96149 và
+#   0,96088). Có thể do meta model phi tuyến dễ học theo nhiễu của OOF hơn là học được tương tác có ích.
 
 # %% [markdown]
 # ### 4.1 Ghép LightGBM với từng model của E3
@@ -367,8 +372,8 @@ P.save(fig, "E5_02_members")
 # | Stacking LightGBM | 0,95883 / 0,95903 | 0,96149 / 0,96088 |
 #
 # **Quyết định:**
-# 1. Dùng stacking LR trên logit, C = 0,003, như khi thi. Trên cả hai bộ, đây là phương pháp tốt nhất hoặc ngang tốt
-#    nhất, và ổn định giữa hai cách chia meta fold.
+# 1. Dùng stacking LR trên logit, C = 0,003, như khi thi. Đây là phương pháp cao nhất trên bộ nhóm; trên bộ E3 chỉ
+#    thua stacking LightGBM ở một meta seed. Kết quả của LR ổn định giữa hai cách chia meta fold.
 # 2. Không dùng LightGBM làm meta model khi chỉ có OOF; phần LightGBM 20% trong stacker khi thi được giữ vì có lợi trên
 #    pool lớn hơn nhiều (E4, bản v15).
 # 3. Khi chọn member, đo đóng góp vào stacking thay vì AUC riêng (khớp với E3 mục 1), và ưu tiên model cùng mạnh nhưng
@@ -390,6 +395,5 @@ P.save(fig, "E5_02_members")
 # | Thay member công khai cũ bằng bản chạy lại (`A_probe_replace.py`, v10 `drop_gpold`) | 17–19/10 | +0,2×10⁻⁶ đến +2,8×10⁻⁶ | – | không qua cổng |
 # | Thêm 16 OOF của các thành viên vào stacking pool công khai | 19/10 | từng member không qua cổng; cả 16 cùng lúc −8×10⁻⁶ đến −1,6×10⁻⁵ | – | pool đã có model cây tương tự |
 # | Gộp model của nhóm thành 1 cột trung bình, hoặc chỉ thêm nhóm không phải cây (`A_team_into_stack.py`) | 19/10 | ≈ 0; chỉ RealMLP hoà (+0,7×10⁻⁶) | 10/15 | dưới cổng |
-# | Đặc trưng từ dòng gần trùng, khớp mọi cột trừ 1 (`A_neardup.py`) | 20/10 | −1,7×10⁻⁶ | – | không có tín hiệu |
+# | Feature từ dòng gần trùng, khớp mọi cột trừ 1 (`A_neardup.py`) | 20/10 | −1,7×10⁻⁶ | – | không có tín hiệu |
 # | Học lại vùng dự đoán tự tin (p > 0,9 hoặc < 0,1) từ feature gốc (`A_confident_errors.py`) | 20/10 | −1,4×10⁻⁶ | – | lỗi ở vùng này giống nhiễu nhãn |
-# | Q-FT trung bình 2 seed thay seed 42 (v17b) | 25/10 | +4,5×10⁻⁶ đến +6,6×10⁻⁶ | 12/15 | dưới cổng; vẫn dùng cho bài nộp vì ổn định hơn một seed |

@@ -512,7 +512,7 @@ if lgb_res is not None:
     ax2.set_xticks(range(len(kept)), labels)
     ax2.set_title("LightGBM (trục tung 0,958–0,961, hẹp hơn 13 lần)")
     ax2.legend(loc="lower right")
-fig.suptitle("Bậc thang đặc trưng: CV AUC sau mỗi bậc", y=1.02)
+fig.suptitle("Bậc thang feature: CV AUC sau mỗi bậc", y=1.02)
 fig.tight_layout()
 P.save(fig, "E2_01_ladder")
 

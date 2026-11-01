@@ -1,7 +1,9 @@
 """Chuyển script dạng ô `# %%` thành notebook và chạy để notebook có sẵn output.
 
-Chạy: python exp/tools/py2nb.py exp/E1_eda.py            -> exp/E1_eda.ipynb (đã chạy)
-      python exp/tools/py2nb.py exp/E1_eda.py --no-run   -> chỉ chuyển, không chạy
+Chạy: python exp/tools/py2nb.py exp/scripts/E1_eda.py            -> exp/E1_eda.ipynb (đã chạy)
+      python exp/tools/py2nb.py exp/scripts/E1_eda.py --no-run   -> chỉ chuyển, không chạy
+
+Script nằm trong exp/scripts/ thì notebook được ghi (và chạy) ở exp/, nên trong script thư mục làm việc là exp/.
 
 Quy ước trong file .py:
     # %% [markdown]
@@ -47,6 +49,7 @@ def parse(text):
 
 
 def main():
+    sys.stdout.reconfigure(encoding="utf-8")  # console Windows (cp1252) không in được tiếng Việt
     ap = argparse.ArgumentParser()
     ap.add_argument("script")
     ap.add_argument("--no-run", action="store_true")
@@ -59,7 +62,8 @@ def main():
     nb = nbformat.v4.new_notebook()
     nb.cells = parse(src.read_text(encoding="utf-8"))
     nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
-    out = src.with_suffix(".ipynb")
+    out_dir = src.parent.parent if src.parent.name == "scripts" else src.parent
+    out = out_dir / f"{src.stem}.ipynb"
 
     if args.keep_outputs:
         old = [c for c in nbformat.read(out, as_version=4).cells if c.cell_type == "code"]
@@ -76,7 +80,7 @@ def main():
     if not args.no_run:
         t0 = time.time()
         NotebookClient(nb, timeout=args.timeout, kernel_name="python3",
-                       resources={"metadata": {"path": str(src.parent)}}).execute()
+                       resources={"metadata": {"path": str(out_dir)}}).execute()
         print(f"Đã chạy {len(nb.cells)} ô trong {time.time() - t0:.0f}s")
     nbformat.write(nb, out)
     print(f"Đã lưu {out}")

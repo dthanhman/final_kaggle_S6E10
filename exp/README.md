@@ -62,18 +62,34 @@ E6 tổng hợp lại những kết quả này.
 
 ## Chạy
 
-Mỗi thí nghiệm là một script có các ô `# %%`, được chuyển thành notebook đã chạy sẵn output:
+Mỗi notebook `exp/E*.ipynb` được sinh từ một script trong `exp/scripts/` (các ô `# %%`) và chạy sẵn output. Muốn
+sửa thì sửa script rồi chạy lại:
 
 ```bash
-python exp/tools/py2nb.py exp/E1_eda.py      # -> exp/E1_eda.ipynb
+python exp/tools/py2nb.py exp/scripts/E1_eda.py      # -> exp/E1_eda.ipynb
 ```
 
-Script thêm `src/` vào đường dẫn import (`sys.path.insert(0, ...)`), ghi bảng ra `results/` và hình ra
+Notebook chạy với thư mục làm việc là `exp/`. Script thêm `src/` vào đường dẫn import (`sys.path.insert(0, ...)`), ghi bảng ra `results/` và hình ra
 `reports/figures/`. Mọi bước học từ dữ liệu (điền thiếu, chuẩn hoá, target encoding, chọn feature, early stopping)
 chỉ fit trên phần train của fold, thông qua `fit_predict` của `src/cv.py`.
 
+Với dữ liệu cuộc thi (`data/README.md`), E0, E1, E2, E4 chạy lại được từ đầu; phần chạy trên Kaggle (`exp/kaggle/`)
+được đọc từ bảng `.csv` đã tải về `results/`. Một số phần đọc file OOF (`*.npy`) không kèm trong repo vì dung lượng
+lớn:
+
+| Phần | Cần file | Khi thiếu file |
+| --- | --- | --- |
+| E3 mục 4, E5 (bộ E3) | OOF của kernel `cs116-e3-models`, tải về `results/E3_models/` | chạy lại kernel bằng `exp/kaggle/E3_models.py` |
+| E5 (bộ nhóm) | 25 OOF lưu khi thi của các model của nhóm (đường dẫn đặt bằng biến môi trường `COMP_OOF_DIR`) | E5 không chạy được; kết quả đã lưu ở `results/E5_*.csv` |
+| E3 mục 1, E6 mục 2–3 | như trên | bỏ qua phần tính lại, dùng bảng đã lưu (`results/E3_competition_models.csv`, `results/E6_*.csv`) |
+
+Các notebook trong repo đã chạy với đủ các file này; số trong phần chữ khớp với bảng trong `results/`.
+
 ## Tài liệu tham khảo
 
+- Pedregosa, F. và cộng sự (2011). Scikit-learn: Machine Learning in Python. *JMLR* 12.
+- van der Maaten, L., Hinton, G. (2008). Visualizing Data using t-SNE. *JMLR* 9.
+- Lundberg, S., Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions (SHAP). *NeurIPS*.
 - Bergstra, J., Bengio, Y. (2012). Random Search for Hyper-Parameter Optimization. *JMLR* 13.
 - Bergstra, J., Bardenet, R., Bengio, Y., Kégl, B. (2011). Algorithms for Hyper-Parameter Optimization (TPE). *NeurIPS*.
 - Akiba, T. và cộng sự (2019). Optuna: A Next-generation Hyperparameter Optimization Framework. *KDD*.

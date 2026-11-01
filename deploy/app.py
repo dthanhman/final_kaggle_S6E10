@@ -40,6 +40,11 @@ def to_frame(df):
     return X
 
 
+def vn(x, spec):
+    """Định dạng số kiểu Việt Nam: dấu phẩy thập phân, dấu chấm phân cách hàng nghìn."""
+    return format(x, spec).translate(str.maketrans(",.", ".,"))
+
+
 def predict(df):
     return load_model().predict(to_frame(df))
 
@@ -52,8 +57,8 @@ def contributions(row_df):
 
 st.set_page_config(page_title="Dự đoán hài lòng hành khách", layout="wide")
 st.title("Dự đoán mức hài lòng của hành khách hàng không")
-st.caption(f"Model: LightGBM trên 21 cột gốc, {META['n_trees']} cây, train trên {META['train_rows']:,} dòng. "
-           f"CV AUC 5 fold: {META['cv_auc']:.4f}. Đồ án CS116, cuộc thi Kaggle Playground S6E10.")
+st.caption(f"Model: LightGBM trên 21 cột gốc, {META['n_trees']} cây, train trên {vn(META['train_rows'], ',')} dòng. "
+           f"CV AUC 5 fold: {vn(META['cv_auc'], '.4f')}. Đồ án CS116, cuộc thi Kaggle Playground S6E10.")
 
 tab1, tab2, tab3 = st.tabs(["Một hành khách", "Dự đoán từ file CSV", "Về model"])
 
@@ -80,9 +85,9 @@ with tab1:
         p = float(predict(df)[0])
         m1, m2 = st.columns([1, 2])
         with m1:
-            st.metric("Xác suất hài lòng", f"{p:.1%}")
+            st.metric("Xác suất hài lòng", vn(p, ".1%"))
             st.progress(p)
-            st.caption(f"Tỉ lệ hài lòng chung trong dữ liệu train: {META['positive_rate']:.1%}.")
+            st.caption(f"Tỉ lệ hài lòng chung trong dữ liệu train: {vn(META['positive_rate'], '.1%')}.")
         with m2:
             contrib, base = contributions(df)
             top = contrib.reindex(contrib.abs().sort_values(ascending=False).index)[:8]
@@ -103,7 +108,8 @@ with tab2:
         else:
             out = pd.DataFrame({"id": df["id"]}) if "id" in df.columns else pd.DataFrame(index=df.index)
             out["satisfaction"] = predict(df)
-            st.success(f"Đã dự đoán {len(out):,} dòng; xác suất hài lòng trung bình {out['satisfaction'].mean():.1%}.")
+            st.success(f"Đã dự đoán {vn(len(out), ',')} dòng; xác suất hài lòng trung bình "
+                       f"{vn(out['satisfaction'].mean(), '.1%')}.")
             st.dataframe(out.head(20), width="stretch")
             st.download_button("Tải kết quả (CSV)", out.to_csv(index=False).encode("utf-8"), "predictions.csv",
                                "text/csv")
@@ -111,10 +117,10 @@ with tab2:
 with tab3:
     st.markdown(f"""
 - **Model:** LightGBM, cấu hình tốt nhất khi tinh chỉnh ở E4 (Random Search, seed 1); learning rate
-  {META['learning_rate']}, {META['n_trees']} cây.
+  {vn(META['learning_rate'], 'g')}, {META['n_trees']} cây.
 - **Đầu vào:** 21 cột gốc, không cần tiền xử lý; LightGBM tự xử lý giá trị thiếu ở `Arrival Delay`.
-- **Đánh giá:** CV AUC {META['cv_auc']:.4f} trên 5 fold `data/folds.csv` (trung bình fold 1–4, chưa dùng khi dò
-  tham số: {META['cv_auc_folds1_4']:.4f}).
+- **Đánh giá:** CV AUC {vn(META['cv_auc'], '.4f')} trên 5 fold `data/folds.csv` (trung bình fold 1–4, chưa dùng
+  khi dò tham số: {vn(META['cv_auc_folds1_4'], '.4f')}).
 - **Vì sao không triển khai bài nộp cuối:** bài nộp (private 0,96239) là stacking trên khoảng 250 OOF công khai cùng
   nhiều model khác; muốn dự đoán dòng mới phải chạy lại tất cả các model đó. Model này đơn giản hơn nhiều, AUC thấp
   hơn khoảng 0,0033, nhưng chạy được ngay trên máy cá nhân.

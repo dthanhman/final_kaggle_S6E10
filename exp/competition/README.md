@@ -14,7 +14,7 @@ Phần **tái lập thật** nằm ở:
 | Tái lập | Ở đâu | Kết quả |
 | --- | --- | --- |
 | File nộp slot 1 (private 0,96239) từ các phần đã lưu | `reproduce_final.py` | trùng từng byte với file đã nộp (cùng md5) |
-| Model `A_lr` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/E2_preprocess.py`) | 0,959727 (chênh 1×10⁻⁵) |
+| Model `A_lr` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/scripts/E2_preprocess.py`) | 0,959727 (chênh 1×10⁻⁵) |
 | Model `A_lgb` (CV khi thi 0,960893) | E2, bậc "4t, lr 0,02" (`exp/kaggle/E2_lgb.py`) | 0,960889 (chênh 4×10⁻⁶) |
 
 Chênh lệch khi tái lập có thể đến từ số luồng (LightGBM không cho kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn,

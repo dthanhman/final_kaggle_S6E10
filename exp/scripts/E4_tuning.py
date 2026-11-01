@@ -18,7 +18,7 @@
 # > | 22/10 | hệ số nhân theo họ model trong LR (TabPFN 2/3/4,5; foundation model khác 1/1,5/2,5; MLP 0,7/1/1,5; bản v16) | lưới 27 điểm, 3 seed | tốt nhất +0,5×10⁻⁶ đến +1,4×10⁻⁶ | dưới cổng |
 # > | 22/10 | tỉ trọng LightGBM trong stacker, W từ 0 đến 0,4 (bản v15) | lưới, 3 seed | W = 0,2 tốt nhất; bỏ hẳn LightGBM giảm 1,1×10⁻⁵ đến 1,7×10⁻⁵ (14/15 fold) | giữ W = 0,2 |
 # > | 25/10 | số epoch fine-tune của Q-FT, 2 hay 4 (Q-FT v3) | thử trực tiếp | thấp hơn ở 5/5 fold | giữ 2 epoch |
-# > | 25/10 | hệ số của Q-FT trong stacker ×1 / ×1,5, một seed hay trung bình 2 seed (bản v17) | lưới, 3 seed | ×1,5 với seed 42: +6×10⁻⁶ đến +8×10⁻⁶, 14/15 fold | qua cổng, dùng cho bài nộp |
+# > | 25/10 | hệ số của Q-FT trong stacker ×1 / ×1,5, một seed hay trung bình 2 seed (bản v17) | lưới, 3 seed | ×1,5 với seed 42: +6×10⁻⁶ đến +8×10⁻⁶, 14/15 fold; trung bình 2 seed (v17b): +4,5×10⁻⁶ đến +6,6×10⁻⁶, 12/15 fold | ×1,5 qua cổng; bài nộp dùng bản trung bình 2 seed, dù dưới cổng, để kết quả không phụ thuộc một seed |
 # >
 # > "Cổng" là ngưỡng giữ thay đổi của nhóm (E0): tăng ít nhất 5×10⁻⁶ ở cả 3 meta seed. Phần lớn các lần dò không qua
 # > cổng. Khi mọi cấu hình chỉ chênh nhau vài phần triệu, cấu hình "tốt nhất" nhiều khả năng chỉ tốt hơn nhờ nhiễu.
@@ -94,7 +94,7 @@ ax.annotate(f"cấu hình mặc định {default_f0:.5f}", (24, default_f0), tex
             ha="right", fontsize=8, color=P.INK_3)
 ax.set_xlabel("số lần thử")
 ax.set_ylabel("AUC fold 0, tốt nhất tới lúc đó")
-ax.set_title("Đường hội tụ: Optuna lên cao nhất trên fold dùng để dò")
+ax.set_title("Điểm tốt nhất sau mỗi lần thử (fold 0, fold dùng để dò)")
 ax.legend(loc="lower right", bbox_to_anchor=(1, 0.08))
 P.save(fig, "E4_01_convergence")
 
@@ -143,7 +143,7 @@ for yi, (a, b) in enumerate(zip(order["fold0_tuned"], order["folds1_4_mean"])):
     ax.plot([a, b], [yi, yi], color=P.GRID, lw=2, zorder=1)
 ax.set_yticks(y, order["tên"])
 ax.set_xlabel("AUC")
-ax.set_title("Điểm trên fold dùng để dò cao hơn điểm thật")
+ax.set_title("AUC trên fold dùng để dò (fold 0) và trên fold 1–4")
 ax.legend(loc="lower right")
 P.save(fig, "E4_02_optimism")
 
@@ -159,7 +159,8 @@ P.save(fig, "E4_02_optimism")
 #   1×10⁻⁴. Với các cấu hình đã dò, khoảng cách này tăng thêm 2×10⁻⁴ đến 4×10⁻⁴ (cột "lạc quan do chọn"; riêng Random
 #   seed 1 gần 0). Lý do là khi chọn cấu hình tốt nhất trong 24 lần thử trên cùng một tập, nhóm chọn luôn cả phần nhiễu
 #   có lợi của tập đó. Đây là cùng một vấn đề với rò rỉ ở E0: tập đã dùng để ra quyết định không còn là tập đánh giá độc
-#   lập. Vì vậy CV 5 fold có chứa fold 0 cũng lạc quan khoảng 1×10⁻⁴.
+#   lập. Vì vậy CV 5 fold có chứa fold 0 cũng lạc quan, khoảng 4×10⁻⁵ đến 8×10⁻⁵ (một phần năm mức lạc quan của
+#   fold 0).
 # - Cả 5 cấu hình tốt nhất đều có `reg_lambda` lớn (5–26) hoặc `colsample_bytree` thấp (0,5–0,7), tức regularization
 #   mạnh hơn mặc định (`reg_lambda` = 0). Bốn cấu hình dò 5 tham số đều có nhiều lá hơn mặc định (88–225 so với 63).
 
@@ -218,7 +219,7 @@ imp.round(3)
 # | Khi thi: tinh chỉnh stacker | 6 lần dò, chỉ 1 lần qua cổng (hệ số Q-FT ×1,5) |
 #
 # **Quyết định:**
-# 1. Tinh chỉnh model đơn có tác dụng (khoảng +5×10⁻⁴, gấp khoảng 10 lần chênh lệch giữa các thư viện boosting), nhưng
+# 1. Tinh chỉnh model đơn có tác dụng (+2×10⁻⁴ đến +6×10⁻⁴, gấp 5–15 lần chênh lệch giữa các thư viện boosting), nhưng
 #    vẫn nhỏ hơn mức tăng nhờ stacking (+7×10⁻⁴ ở E3). Ở E3, cả họ LightGBM chỉ đóng góp 5×10⁻⁵ cho stacking. Kết quả
 #    này ủng hộ lựa chọn khi thi là dành thời gian tìm model khác loại hơn là dò tham số LightGBM.
 # 2. Khi dò tham số, dùng Random Search hoặc Optuna thay cho Grid Search nếu có hơn 2–3 tham số, chạy ít nhất 2 seed, và
@@ -238,7 +239,5 @@ imp.round(3)
 # | Stacker: bỏ member gần trùng (ρ > 0,999) và stacker riêng theo `Type of Travel` (v3) | 16/10 | âm; −7×10⁻⁶ đến −1×10⁻⁵ | – | không giúp |
 # | Stacker: FWLS theo nhóm khách (v13) | 20/10 | +1,8×10⁻⁶ đến +3,5×10⁻⁶ | 11/15 | dưới cổng |
 # | Stacker: bỏ một nhóm member, thêm FWLS và RealMLP (v14) | 20/10 | +3,5×10⁻⁶ đến +5,7×10⁻⁶ | 12/15 | không qua cổng ở cả 3 seed |
-# | Stacker: lưới hệ số theo họ model (v16, 27 điểm) | 22/10 | +0,5×10⁻⁶ đến +1,4×10⁻⁶ | 8/15 | dưới cổng |
-# | Q-FT trung bình 2 seed thay cho seed 42 trong stacker (v17b) | 25/10 | +4,5×10⁻⁶ đến +6,6×10⁻⁶ | 12/15 | thấp hơn khi dùng riêng seed 42 (+6×10⁻⁶ đến +8×10⁻⁶, 14/15) |
-# | Q-FT fine-tune 4 epoch thay cho 2 | 25/10 | 0,9593 so với 0,9611 | 0/5 | overfit |
+# | Stacker: lưới hệ số theo họ model (v16, 27 điểm) | 22/10 | +0,5×10⁻⁶ đến +1,4×10⁻⁶ | 8/15 | dưới cổng |# | Q-FT fine-tune 4 epoch thay cho 2 | 25/10 | 0,9593 so với 0,9611 | 0/5 | overfit |
 # | Grid Search 3 tham số (24 lần thử) | kiểm chứng | +2,8×10⁻⁴ so với mặc định | 3/4 | thấp hơn Random / Optuna với cùng số lần thử |

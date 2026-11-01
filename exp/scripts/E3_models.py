@@ -166,8 +166,8 @@ if (COMP_OOF / "oof_A_qft2_v2avg.npy").exists():
 #   là Q-FT học theo cách khác (tiền huấn luyện tự giám sát rồi fine-tune) nên sai ở những dòng khác với model cây,
 #   nhưng phần này nhóm chưa kiểm chứng trực tiếp.
 # - Ngoài Q-FT, chỉ 4 họ có Δ từ −1×10⁻⁵ trở xuống: LightGBM (−5,1×10⁻⁵), XGBoost / CatBoost dùng dữ liệu gốc
-#   (−2,7×10⁻⁵), LR + token GPT-2 (−1,6×10⁻⁵) và LR (−1,1×10⁻⁵). Các họ còn lại nằm trong ±6×10⁻⁶, nhỏ hơn ngưỡng
-#   3×10⁻⁵ nhóm dùng khi thi (E0), nên không phân biệt được bỏ hay giữ.
+#   (−2,7×10⁻⁵), LR + token GPT-2 (−1,6×10⁻⁵) và LR (−1,1×10⁻⁵). Các họ còn lại nằm trong ±6×10⁻⁶, xấp xỉ
+#   mức tối thiểu 5×10⁻⁶ của cổng (E0), nên không phân biệt được bỏ hay giữ.
 # - AUC riêng cao chưa chắc giúp được stacking. FT-Transformer (0,96005, model nơ-ron mạnh thứ hai) và TabM (0,95954)
 #   đều có Δ khoảng +5×10⁻⁶, trong khi tương quan với LightGBM khá cao (0,946–0,966). Ngược lại kNN có tương quan thấp
 #   nhất (0,867) nhưng AUC quá thấp (0,9503) nên cũng không giúp.
@@ -379,9 +379,9 @@ for i, v in enumerate(d["cv_auc"]):
     ax.text(v + 0.001, i, f"{v:.4f}", va="center", fontsize=7.5, color=P.INK_2)
 ax.set_xlim(0.80, 0.975)
 ax.set_xlabel("CV AUC (5 fold)")
-ax.set_title("CV AUC theo mô hình (trục hoành bắt đầu từ 0,80)")
+ax.set_title("CV AUC theo model (trục hoành bắt đầu từ 0,80)")
 from matplotlib.patches import Patch
-ax.legend(handles=[Patch(color=c, label=f) for f, c in fam_color.items()], loc="lower right", fontsize=7)
+ax.legend(handles=[Patch(color=c, label=f) for f, c in fam_color.items()], loc="upper center", bbox_to_anchor=(0.5, -0.11), ncol=4, fontsize=7.5)
 ax = axes[1]
 m = allm[allm["model"] != "decision_tree_full"]
 OFFSET = {"lightgbm": (-8, 6, "right"), "xgboost": (6, -2, "left"), "catboost": (6, -2, "left"),
@@ -438,9 +438,10 @@ for x, v in zip(lcs["n_train"], lcs[("val_auc", "mean")]):
     ax.annotate(f"{v:.4f}", (x, v), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=7.5, color=P.INK_2)
 ax.set_xscale("log")
 ax.set_xticks(lcs["n_train"], [f"{n / 1000:.0f}k" for n in lcs["n_train"]])
+ax.set_xticks([], minor=True)
 ax.set_xlabel("số dòng train (thang log)")
 ax.set_ylabel("AUC")
-ax.set_title("Learning curve LightGBM: AUC CV vẫn tăng khi gấp đôi dữ liệu")
+ax.set_title("Learning curve của LightGBM")
 ax.legend(loc="center right")
 P.save(fig, "E3_03_learning_curve")
 lc_tab = lcs.copy()
@@ -479,7 +480,7 @@ for i in range(len(order)):
         ax.text(j, i, "1" if i == j else f"{v:.3f}"[1:], ha="center", va="center", fontsize=6.5, color="white" if v > 0.95 else P.INK)
 ax.grid(False)
 fig.colorbar(im, ax=ax, shrink=0.8, label="tương quan rank")
-ax.set_title("Tương quan rank giữa OOF của các mô hình")
+ax.set_title("Tương quan rank giữa OOF của các model")
 P.save(fig, "E3_04_rank_corr")
 
 # %% [markdown]
