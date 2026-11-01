@@ -1,4 +1,4 @@
-mô hình,AUC trên train (QT1),AUC 5-fold CV (QT3),chênh lệch
+model,AUC trên train (QT1),AUC 5-fold CV (QT3),chênh lệch
 Logistic Regression,0.9217426336326002,0.9217245006854954,1.8132947104843034e-05
 Decision Tree (depth 10),0.9543299605465415,0.9512742068967449,0.0030557536497966
 Decision Tree (không giới hạn),1.0,0.8640538561942555,0.13594614380574455

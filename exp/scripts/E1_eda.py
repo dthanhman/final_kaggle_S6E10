@@ -231,7 +231,7 @@ print(f"Tỉ lệ hài lòng ở dòng thiếu: {train.loc[miss, TARGET].mean():
 print(f"Delay đi ở dòng thiếu: trung vị {dep[miss].median():.0f}, tỉ lệ = 0: {(dep[miss] == 0).mean():.1%}")
 print(f"Tương quan Spearman delay đi và đến (dòng đủ): {dep.corr(arr, method='spearman'):.3f}")
 print(f"Tỉ lệ dòng có delay đến = delay đi: {(arr == dep)[~miss].mean():.1%}")
-print("=> Có thể điền delay đến bằng delay đi (hoặc mô hình hồi quy); so sánh các cách điền ở E2.")
+print("=> Có thể điền delay đến bằng delay đi (hoặc model hồi quy); so sánh các cách điền ở E2.")
 
 # %% [markdown]
 # **Nhận xét mục 3**
@@ -427,7 +427,7 @@ P.save(fig, "E1_09_category_interaction")
 # **Nhận xét mục 5**
 # - Cặp tương quan mạnh nhất là wifi và đặt vé online (0,77). Các cột điểm chia thành hai cụm: "trải nghiệm trên máy
 #   bay" (ghế, vệ sinh, giải trí, đồ ăn; 0,62–0,73) và "đặt vé, sân bay" (wifi, đặt vé, vị trí cổng, giờ bay;
-#   0,55–0,77). Không cặp nào vượt 0,8 nên không có cột trùng lặp hẳn, nhưng đa cộng tuyến ở mức vừa, vì vậy model
+#   0,42–0,77). Không cặp nào vượt 0,8 nên không có cột trùng lặp hẳn, nhưng đa cộng tuyến ở mức vừa, vì vậy model
 #   tuyến tính nên có regularization (Ridge hoặc L1, Bài 07).
 # - Hai cột delay chỉ tương quan Spearman 0,47, do phần lớn giá trị bằng 0 và các giá trị khác 0 lệch nhau nhiều.
 # - Có tương tác mạnh giữa các cột category. Khách công tác ngồi Business hài lòng 73%, còn khách đi việc riêng chỉ
@@ -541,8 +541,8 @@ clu.round(3)
 #   bộ, gợi ý model cây hoặc boosting sẽ hợp hơn model tuyến tính (kiểm chứng ở E3).
 # - Với KMeans 6 cụm trên 13 cột điểm, tỉ lệ hài lòng giữa các cụm chênh từ 10% đến 85%, và riêng mã cụm đã đạt AUC
 #   0,854. Cụm có wifi thấp (1,9) nhưng online boarding, giải trí, ghế cao vẫn có 85% hài lòng; ngược lại cụm có giải
-#   trí và ghế cao (4,4 và 4,3) nhưng online boarding thấp (2,0) chỉ có 10%. Như vậy online boarding ảnh hưởng nhiều
-#   hơn tiện nghi trên máy bay. Inertia giảm đều theo k, không có "khuỷu tay" rõ, nên k = 6 chỉ là lựa chọn để minh
+#   trí và ghế cao (4,4 và 4,3) nhưng online boarding thấp (2,0) chỉ có 10%. Hai cụm này gợi ý online boarding có thể
+#   ảnh hưởng tới mức hài lòng nhiều hơn tiện nghi trên máy bay. Inertia giảm đều theo k, không có "khuỷu tay" rõ, nên k = 6 chỉ là lựa chọn để minh
 #   hoạ; feature cụm được thử ở E2.
 
 # %% [markdown]

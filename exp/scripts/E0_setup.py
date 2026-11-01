@@ -53,7 +53,7 @@ N_JOBS = 6  # giới hạn số luồng để máy không quá tải
 
 # %% [markdown]
 # ## 1. Độ đo
-# ### 1.1 Mô hình baseline
+# ### 1.1 Model baseline
 # Logistic Regression với tiền xử lý tối thiểu. `Arrival Delay` thiếu được điền bằng `Departure Delay`, hai cột delay
 # lấy log1p, cột số và cột điểm chuẩn hoá z-score, cột category mã hoá one-hot. Toàn bộ pipeline đặt trong
 # `fit_predict`, vì vậy chỉ học từ phần train của mỗi fold.
@@ -173,8 +173,8 @@ for name, fp in [("Logistic Regression", fp_lr), ("Decision Tree (depth 10)", fp
                  ("Decision Tree (không giới hạn)", fp_tree(None))]:
     p_tr, _ = fp(train[FEATURES], y, train[FEATURES], test[FEATURES].head(5))
     res = base if name == "Logistic Regression" else run_cv(fp, train, test, FEATURES, verbose=False)
-    rows.append({"mô hình": name, "AUC trên train (QT1)": roc_auc_score(y, p_tr), "AUC 5-fold CV (QT3)": res["cv_auc"]})
-qt1 = pd.DataFrame(rows).set_index("mô hình")
+    rows.append({"model": name, "AUC trên train (QT1)": roc_auc_score(y, p_tr), "AUC 5-fold CV (QT3)": res["cv_auc"]})
+qt1 = pd.DataFrame(rows).set_index("model")
 qt1["chênh lệch"] = qt1.iloc[:, 0] - qt1.iloc[:, 1]
 qt1.to_csv(RESULTS_DIR / "E0_resubstitution.csv")
 qt1.round(4)
@@ -230,7 +230,7 @@ P.save(fig, "E0_02_holdout_vs_kfold")
 # - K-fold cho dự đoán OOF trên toàn bộ 700 nghìn dòng train; đây là đầu vào cho stacking ở E5.
 
 # %% [markdown]
-# ## 3. OOF sạch và OOF bẩn: rò rỉ dữ liệu làm CV "đẹp giả"
+# ## 3. OOF sạch và OOF bẩn: rò rỉ dữ liệu làm CV cao hơn điểm thật
 # Muốn biết CV lệch bao nhiêu thì cần một tập chưa từng được dùng. Nhóm lấy fold 0–3 làm tập phát triển (dev, chạy CV
 # 4 fold như bình thường) và giữ fold 4 làm tập test giả. Với model sạch, CV trên dev xấp xỉ điểm trên fold 4; với
 # model bẩn, CV cao hơn điểm thật.
