@@ -49,6 +49,7 @@ def build_log(old_repo):
     for c in ("cv_auc", "lb_auc"):
         df[c] = pd.to_numeric(df[c], errors="coerce")
     df.insert(3, "loại", df["model"].map(kind_of))
+    df = df.drop(columns="author")  # báo cáo ghi công cho cả nhóm, không ghi theo người
     df.to_csv(OUT / "competition_log.csv", index=False, quoting=csv.QUOTE_NONNUMERIC)
     print(f"competition_log.csv: {len(df)} dòng")
 
