@@ -1,0 +1,107 @@
+{
+  "features": [
+    "Gender",
+    "Customer Type",
+    "Type of Travel",
+    "Class",
+    "Inflight wifi service",
+    "Departure/Arrival time convenient",
+    "Ease of Online booking",
+    "Gate location",
+    "Food and drink",
+    "Online boarding",
+    "Seat comfort",
+    "Inflight entertainment",
+    "On-board service",
+    "Leg room service",
+    "Baggage handling",
+    "Checkin service",
+    "Cleanliness",
+    "Age",
+    "Flight Distance",
+    "Departure Delay in Minutes",
+    "Arrival Delay in Minutes"
+  ],
+  "cat_cols": [
+    "Gender",
+    "Customer Type",
+    "Type of Travel",
+    "Class"
+  ],
+  "score_cols": [
+    "Inflight wifi service",
+    "Departure/Arrival time convenient",
+    "Ease of Online booking",
+    "Gate location",
+    "Food and drink",
+    "Online boarding",
+    "Seat comfort",
+    "Inflight entertainment",
+    "On-board service",
+    "Leg room service",
+    "Baggage handling",
+    "Checkin service",
+    "Cleanliness"
+  ],
+  "num_cols": [
+    "Age",
+    "Flight Distance",
+    "Departure Delay in Minutes",
+    "Arrival Delay in Minutes"
+  ],
+  "categories": {
+    "Gender": [
+      "Female",
+      "Male"
+    ],
+    "Customer Type": [
+      "Loyal Customer",
+      "disloyal Customer"
+    ],
+    "Type of Travel": [
+      "Business travel",
+      "Personal Travel"
+    ],
+    "Class": [
+      "Business",
+      "Eco",
+      "Eco Plus"
+    ]
+  },
+  "num_ranges": {
+    "Age": [
+      7.0,
+      85.0,
+      40.0
+    ],
+    "Flight Distance": [
+      67.0,
+      4983.0,
+      954.0
+    ],
+    "Departure Delay in Minutes": [
+      0.0,
+      489.0,
+      0.0
+    ],
+    "Arrival Delay in Minutes": [
+      0.0,
+      491.0,
+      0.0
+    ]
+  },
+  "params": {
+    "num_leaves": 125,
+    "min_child_samples": 15,
+    "colsample_bytree": 0.691,
+    "subsample": 0.99,
+    "reg_lambda": 20.204860742274565
+  },
+  "n_trees": 194,
+  "learning_rate": 0.1,
+  "cv_auc": 0.95893,
+  "cv_auc_folds1_4": 0.95892,
+  "train_rows": 699635,
+  "positive_rate": 0.4436,
+  "note": "LightGBM 21 cột gốc, cấu hình random_s1 của E4; CV đo ở E4 (learning rate 0,1, 5 fold)."
+}

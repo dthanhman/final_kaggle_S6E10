@@ -10,3 +10,5 @@ optuna
 jupyter
 openpyxl
 kaggle
+streamlit
+pyarrow<20  # NumPy 1.x: pyarrow >= 20 cần NumPy 2

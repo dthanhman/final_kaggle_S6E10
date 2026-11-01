@@ -23,6 +23,7 @@
 │   ├── kaggle/        # phần chạy trên Kaggle (E2_lgb.py, E3_models.py, E4_tuning.py)
 │   ├── competition/   # code gốc khi thi (lưu tra cứu) + reproduce_final.py tái tạo file nộp
 │   └── tools/         # py2nb.py, kaggle_bundle.py, build_competition_log.py
+├── deploy/            # E7: app Streamlit (app.py), train_model.py, model_lgb.txt; xem deploy/README.md
 ├── results/           # bảng kết quả E0–E6 (E2_lgb/, E3_models/, E4_tuning/: output Kaggle), competition_*.csv
 └── reports/figures/   # hình cho báo cáo: E0_*.png, E1_*.png, …
 ```
