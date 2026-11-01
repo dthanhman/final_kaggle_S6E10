@@ -1,21 +1,21 @@
 # %% [markdown]
-# # E2. Tiền xử lý, tạo và chọn đặc trưng
+# # E2. Tiền xử lý, tạo và chọn feature
 #
-# Bước **Data preprocessing** của ML pipeline (Bài 04): xử lý giá trị thiếu, ngoại lệ, biến đổi và mã hoá đặc trưng,
-# tạo đặc trưng mới, chọn đặc trưng. Mỗi lựa chọn được kiểm chứng bằng CV 5 fold trên `data/folds.csv` (quy ước ở E0),
-# xuất phát từ các phát hiện ở E1.
+# Đây là bước Data preprocessing của ML pipeline (Bài 04), gồm xử lý giá trị thiếu và ngoại lệ, biến đổi và mã hoá
+# feature, tạo feature mới và chọn feature. Các lựa chọn xuất phát từ phát hiện ở E1 và được kiểm chứng bằng CV 5 fold
+# trên `data/folds.csv` theo quy ước ở E0.
 #
 # > **Trong cuộc thi.** Model LightGBM đầu tiên của nhóm, `A_lgb` (14/10, CV 0,96089), được xây theo kiểu bậc thang:
-# > mỗi bước thêm một nhóm feature, giữ bước nào làm CV tăng (`src/features.py`, chuyển từ code thi). Model tuyến
-# > tính `A_lr` (15/10, CV 0,95974) dùng lại các feature đó dưới dạng one-hot thưa. Ngày 18/10 nhóm thử ghép thẳng
-# > 129 nghìn dòng dữ liệu gốc vào phần train của fold: chỉ +1e-4 (`A_lgb_origrow` 0,959729 so với 0,959630).
-# > Notebook này dựng lại hai bậc thang đó một cách có hệ thống và thêm các so sánh theo Bài 04.
+# > mỗi bước thêm một nhóm feature và chỉ giữ bước làm CV tăng (`src/features.py`, chuyển từ code thi). Model Logistic
+# > Regression `A_lr` (15/10, CV 0,95974) dùng lại các feature đó dưới dạng one-hot thưa. Ngày 18/10 nhóm thử ghép
+# > thẳng 129 nghìn dòng dữ liệu gốc vào phần train của fold, nhưng chỉ tăng 1×10⁻⁴ (`A_lgb_origrow` 0,959729 so với
+# > 0,959630). Phần dưới chạy lại hai bậc thang đó trên cùng fold và bổ sung các so sánh theo Bài 04.
 #
 # Nội dung:
 # 1. Logistic Regression: bậc thang từ baseline E0 tới công thức `A_lr`
 # 2. Các nhánh tiền xử lý trên LR: giá trị thiếu, biến đổi delay, chuẩn hoá
-# 3. Tạo đặc trưng theo Bài 04 / 06: tổng hợp điểm, cụm KMeans, PCA
-# 4. Chọn đặc trưng: filter, wrapper, embedded
+# 3. Tạo feature theo Bài 04 / 06: tổng hợp điểm, cụm KMeans, PCA
+# 4. Chọn feature: filter, wrapper, embedded
 # 5. LightGBM (chạy trên Kaggle): cùng bậc thang và cùng các nhánh, so với LR
 # 6. Tóm tắt
 
@@ -83,11 +83,12 @@ def cached(variant, fn, base=None, notes=""):
 
 
 # %% [markdown]
-# ## 1. Logistic Regression: bậc thang đặc trưng
-# LR là mô hình tuyến tính: mỗi đặc trưng chỉ đóng góp theo một hệ số, nên mọi quan hệ phi tuyến, mọi tương tác và
-# "điểm 0 khác biệt" (E1) đều phải được **mã hoá sẵn** thành đặc trưng. Đây là chỗ tiền xử lý quan trọng nhất.
+# ## 1. Logistic Regression: bậc thang feature
+# LR là model tuyến tính, mỗi feature chỉ đóng góp qua một hệ số. Vì vậy các quan hệ phi tuyến, các tương tác và
+# trường hợp điểm 0 (E1) đều phải được mã hoá sẵn thành feature, và tiền xử lý ảnh hưởng tới LR nhiều hơn tới model
+# cây.
 #
-# Các khối đặc trưng (khối không dùng nhãn tính một lần trên train + test; khối dùng nhãn tính trong fold):
+# Các khối feature (khối không dùng nhãn tính một lần trên train + test; khối dùng nhãn tính trong fold):
 #
 # | Khối | Nội dung | Dùng nhãn? |
 # | --- | --- | --- |
@@ -101,7 +102,7 @@ def cached(variant, fn, base=None, notes=""):
 # | `te` | target encoding của mọi khoá trên (2 mức làm trơn), fit trong fold rồi lấy logit | **có, trong fold** |
 # | `orig` | 4 teacher train trên dữ liệu gốc + tỉ lệ hài lòng theo giá trị / khoá trên dữ liệu gốc (logit) | chỉ nhãn dữ liệu gốc |
 #
-# Giá trị one-hot xuất hiện dưới 20 lần gộp chung một cột. Mọi bậc dùng LR với C = 0,05 (như `A_lr`).
+# Giá trị one-hot xuất hiện dưới 20 lần được gộp chung một cột. Mọi bậc dùng LR với C = 0,05, giống `A_lr`.
 
 # %%
 cache = DATA_DIR / "cache" / "static_step4_teachers.pkl"
@@ -210,22 +211,24 @@ for name, blocks, te in ladder:
 
 # %% [markdown]
 # **Nhận xét mục 1**
-# - Tổng cộng LR đi từ 0,9217 lên **0,9597 (+0,038)**, mọi bậc giữ lại đều tăng ở cả 5 fold.
-# - **Bậc lớn nhất là L1 (+0,0270): mã hoá điểm dịch vụ thành one-hot.** Đúng như E1: điểm 0 ("không áp dụng") và
-#   quan hệ không đơn điệu chỉ học được khi mỗi mức điểm có hệ số riêng. Một thay đổi mã hoá, không thêm thông tin
-#   nào, mà tăng gần 6 lần tổng các bậc L2–L5 cộng lại (0,0046).
-# - L2 one-hot giá trị và khoảng (+0,0021) bắt được quan hệ hình chữ ∩ của tuổi; L3 cặp cột (+0,0023) bắt được tương
-#   tác `Type of Travel` × `Class` (E1 mục 5). Mô hình tuyến tính cần feature ghép để học tương tác.
-# - L4 chữ số, tần suất: +3e-6, chỉ 3/5 fold, **không có tác dụng với LR** (ngược với LightGBM, mục 5).
-# - L5 target encoding trong fold: +0,00025. L6 dữ liệu gốc: **+0,0064**, bậc lớn thứ hai: các teacher học trên dữ liệu
-#   gốc mang sẵn quan hệ phi tuyến mà LR không tự học được.
-# - **Tái lập:** L6 đạt 0,959727, so với `A_lr` khi thi 0,959737 (chênh 1e-5, tương quan thứ hạng giữa hai bộ dự đoán
-#   0,9998). Sai khác còn lại do phiên bản scikit-learn.
+# - Qua các bậc, CV của LR tăng từ 0,9217 lên **0,9597** (+0,038), và mọi bậc được giữ đều tăng ở cả 5 fold.
+# - **Bậc lớn nhất là L1 (+0,0270), mã hoá điểm dịch vụ thành one-hot.** Kết quả này khớp với E1: điểm 0 ("không áp
+#   dụng") và quan hệ không đơn điệu chỉ học được khi mỗi mức điểm có hệ số riêng. Chỉ đổi cách mã hoá, không thêm
+#   thông tin, nhưng mức tăng gần gấp 6 lần tổng các bậc L2–L5 (0,0046).
+# - L2 (one-hot giá trị và khoảng, +0,0021) cho phép LR học quan hệ hình chữ ∩ của tuổi; L3 (cặp cột, +0,0023) cho
+#   phép học tương tác `Type of Travel` × `Class` đã thấy ở E1 mục 5.
+# - L4 (chữ số, tần suất) chỉ tăng 3×10⁻⁶ và tăng ở 3/5 fold, tức không có tác dụng với LR; với LightGBM thì ngược lại
+#   (mục 5).
+# - L5 (target encoding trong fold) tăng 2,5×10⁻⁴. L6 (dữ liệu gốc) tăng 0,0064, lớn thứ hai. Các teacher (model chỉ
+#   train trên dữ liệu gốc, dự đoán của chúng được dùng làm feature) đưa vào những quan hệ phi tuyến mà LR không tự học
+#   được.
+# - Về tái lập, L6 đạt 0,959727 so với 0,959737 của `A_lr` khi thi (chênh 1×10⁻⁵, tương quan thứ hạng giữa hai bộ dự
+#   đoán 0,9998). Phần chênh còn lại có thể do khác phiên bản scikit-learn.
 
 # %% [markdown]
 # ## 2. Các nhánh tiền xử lý trên LR
-# Giữ nguyên baseline L0, mỗi lần chỉ đổi **một** bước. Mọi bước học từ dữ liệu (imputer, scaler) nằm trong pipeline
-# nên chỉ fit trên phần train của fold.
+# Giữ nguyên baseline L0, mỗi lần chỉ đổi một bước. Các bước học từ dữ liệu (imputer, scaler) nằm trong pipeline nên
+# chỉ fit trên phần train của fold.
 #
 # ### 2.1 Giá trị thiếu (`Arrival Delay`, 0,04% số dòng)
 
@@ -316,20 +319,22 @@ for name, sc in [("scale: không chuẩn hoá", None), ("scale: Min-Max", MinMax
 
 # %% [markdown]
 # **Nhận xét mục 2**
-# - **Giá trị thiếu:** điền median, điền bằng delay đi, thêm cờ thiếu hay KNNImputer đều cho cùng kết quả (±1e-6):
-#   292 dòng (0,04%) quá ít để ảnh hưởng. Giữ cách đơn giản nhất có cơ sở từ E1 (điền bằng delay đi).
-# - **Biến đổi delay:** để nguyên phút làm giảm 0,00017 (0/5 fold tăng), log1p giảm ảnh hưởng của đuôi dài lên hệ số
-#   tuyến tính. Sau khi đã log1p, cắt ở phân vị 99 (+4e-6) hay thêm cờ "có trễ" (+8e-6) không thêm gì.
-# - **Chuẩn hoá:** z-score, Min-Max, Robust hay không chuẩn hoá cho cùng AUC (±3e-6) vì mô hình hội tụ về cùng nghiệm,
-#   nhưng **không chuẩn hoá thì thời gian huấn luyện tăng từ khoảng 21 giây lên 898 giây (×43)**: thuật toán tối ưu
-#   (L-BFGS) hội tụ chậm khi các cột có thang đo chênh lệch. Đúng ý Bài 04: chuẩn hoá giúp "học nhanh hơn".
-# - Kết luận: với dữ liệu này, các bước tiền xử lý "kinh điển" chỉ có tác dụng khi chúng đổi được dạng quan hệ
-#   (log1p), còn điền thiếu và cắt ngoại lệ không đáng kể.
+# - Với giá trị thiếu, điền median, điền bằng delay đi, thêm cờ thiếu hay dùng KNNImputer đều cho cùng kết quả (chênh
+#   trong ±1×10⁻⁶), vì 292 dòng (0,04%) quá ít để ảnh hưởng. Nhóm giữ cách đơn giản nhất có cơ sở từ E1 là điền bằng
+#   delay đi.
+# - Để nguyên delay theo phút làm CV giảm 1,7×10⁻⁴ (0/5 fold tăng); log1p làm giảm ảnh hưởng của phần đuôi dài lên hệ
+#   số tuyến tính. Sau khi đã log1p, cắt ở phân vị 99 (+4×10⁻⁶) hay thêm cờ "có trễ" (+8×10⁻⁶) không có thêm tác dụng.
+# - z-score, Min-Max, Robust và không chuẩn hoá cho cùng AUC (chênh trong ±3×10⁻⁶), vì model hội tụ về cùng nghiệm.
+#   Khác biệt nằm ở thời gian: **không chuẩn hoá thì thời gian huấn luyện tăng từ khoảng 21 giây lên 898 giây (×43)**,
+#   do L-BFGS hội tụ chậm khi các cột có thang đo chênh nhau nhiều. Điều này đúng với nhận định trong Bài 04 rằng
+#   chuẩn hoá giúp học nhanh hơn.
+# - Tóm lại, trên dữ liệu này các bước tiền xử lý thông dụng chỉ có tác dụng khi chúng thay đổi dạng quan hệ (như
+#   log1p); điền thiếu và cắt ngoại lệ gần như không ảnh hưởng.
 
 # %% [markdown]
-# ## 3. Tạo đặc trưng theo Bài 04 / 06: tổng hợp điểm, cụm KMeans, PCA
-# Ở E1, riêng PC1 đạt AUC 0,880 và mã cụm KMeans đạt 0,854, cao hơn mọi cột đơn. Thử thêm vào L1 (LR còn đơn giản)
-# và L6 (công thức đầy đủ). KMeans và PCA fit trên phần train của fold.
+# ## 3. Tạo feature theo Bài 04 / 06: tổng hợp điểm, cụm KMeans, PCA
+# Ở E1, riêng PC1 đạt AUC 0,880 và mã cụm KMeans đạt 0,854, cao hơn mọi cột đơn. Nhóm thử thêm các feature này vào L1
+# (LR còn ít feature) và L6 (bộ đầy đủ). KMeans và PCA chỉ fit trên phần train của fold.
 
 # %%
 S_all = X[SCORE_COLS].astype(float)
@@ -373,14 +378,14 @@ cached("L6 + cả ba", lambda: lr_cv(L6_blocks, te=True, extra=extra_all), base=
 
 # %% [markdown]
 # **Nhận xét mục 3**
-# - Trên L1: tổng hợp điểm +0,00038, cụm KMeans +0,00031, gộp cả ba +0,00051 (đều 5/5 fold). **PCA không thêm gì**
-#   (≈ 0, 3/5 fold): PCA chỉ là phép xoay tuyến tính, LR vốn đã tự tổ hợp tuyến tính các cột. Trung bình điểm
-#   (bỏ điểm 0), số điểm 0 hay mã cụm là biến đổi **phi tuyến** nên mới mang thông tin mới.
-# - Trên L6: cả ba chỉ thêm +0,00003. Khi đã có one-hot từng mức điểm, cặp cột và teacher, thông tin của chúng đã có
-#   sẵn, nên **không giữ**. Đặc trưng tổng hợp chỉ có ích khi mô hình còn nghèo đặc trưng.
+# - Trên L1, feature tổng hợp điểm tăng 3,8×10⁻⁴, cụm KMeans tăng 3,1×10⁻⁴, gộp cả ba tăng 5,1×10⁻⁴ (đều 5/5 fold).
+#   PCA gần như không thêm gì (3/5 fold), vì PCA chỉ là phép xoay tuyến tính trong khi LR vốn đã tổ hợp tuyến tính các
+#   cột. Trung bình điểm (bỏ điểm 0), số điểm 0 hay mã cụm là các biến đổi phi tuyến nên mới mang thêm thông tin.
+# - Trên L6, cả ba chỉ tăng 3×10⁻⁵. Khi đã có one-hot từng mức điểm, cặp cột và teacher, thông tin này đã có sẵn, nên
+#   nhóm không giữ chúng.
 
 # %% [markdown]
-# ## 4. Chọn đặc trưng (Bài 04)
+# ## 4. Chọn feature (Bài 04)
 # ### 4.1 Filter: bỏ các cột yếu nhất khi đứng riêng (E1: AUC một cột ≤ 0,53)
 
 # %%
@@ -403,7 +408,7 @@ cached("filter: L1 bỏ 5 cột yếu", lambda: run_cv(fp_l1_drop, train, test.h
 
 # %% [markdown]
 # ### 4.2 Wrapper: loại ngược từng khối khỏi công thức đầy đủ L6
-# Bỏ lần lượt từng khối, xem CV giảm bao nhiêu: khối nào bỏ mà không giảm là khối thừa.
+# Bỏ lần lượt từng khối và xem CV giảm bao nhiêu; khối nào bỏ đi mà CV không giảm là khối thừa.
 
 # %%
 drop_rows = []
@@ -413,8 +418,8 @@ for blk in ["values", "pairs", "digits", "orig"]:
 r = cached("wrapper: L6 bỏ target encoding", lambda: lr_cv(L6_blocks, te=False), base=LR[ladder[-1][0]])
 
 # %% [markdown]
-# ### 4.3 Embedded: LR chính quy hoá L1 (LASSO) trên L1
-# Phạt L1 đẩy hệ số của đặc trưng không quan trọng về 0. Giảm C thì ít đặc trưng được giữ hơn.
+# ### 4.3 Embedded: LR với regularization L1 (LASSO) trên bộ L1
+# Regularization L1 đẩy hệ số của các feature không quan trọng về 0; C càng nhỏ thì càng ít feature được giữ.
 
 # %%
 emb = []
@@ -427,20 +432,21 @@ pd.DataFrame(emb)
 
 # %% [markdown]
 # **Nhận xét mục 4**
-# - **Filter theo AUC một cột là sai hướng:** bỏ 5 cột yếu nhất ở E1 (AUC ≤ 0,53) làm CV giảm 0,0014, 0/5 fold tăng.
-#   Cột yếu khi đứng riêng vẫn có ích khi kết hợp, đúng như cảnh báo ở E1.
-# - **Wrapper (bỏ từng khối khỏi L6):** dữ liệu gốc −0,0064, cặp cột −0,00056, one-hot giá trị −0,00009,
-#   target encoding −0,00006 (đều 0/5 fold), riêng **khối chữ số −0,000001 (2/5 fold) là thừa** và bỏ được.
-# - **Embedded (LASSO trên L1, 91 hệ số):** C = 0,05 giữ 77 hệ số và gần như không mất gì (−0,000015); C = 0,01 giữ 67
-#   (−0,00011); C = 0,002 giữ 57 (−0,00085); C = 0,0005 giữ 36 (−0,0035). Có thể bỏ khoảng 15% hệ số mà không mất độ
-#   chính xác, nhưng bỏ nhiều hơn thì giảm nhanh. (saga chạy 100 vòng, chưa hội tụ hoàn toàn ở C lớn.)
-# - Với 700 nghìn dòng, LR không bị overfit vì thừa feature, nên chọn feature ở đây chủ yếu
-#   để hiểu khối nào quan trọng, không để tăng điểm.
+# - Lọc theo AUC của từng cột (filter) cho kết quả xấu: bỏ 5 cột yếu nhất ở E1 (AUC ≤ 0,53) làm CV giảm 0,0014, không
+#   fold nào tăng. Cột yếu khi đứng riêng vẫn có ích khi kết hợp với cột khác, như đã lưu ý ở E1.
+# - Khi bỏ từng khối khỏi L6 (wrapper), CV giảm 0,0064 nếu bỏ dữ liệu gốc, 5,6×10⁻⁴ nếu bỏ cặp cột, 9×10⁻⁵ nếu bỏ
+#   one-hot giá trị và 6×10⁻⁵ nếu bỏ target encoding (đều 0/5 fold tăng). Riêng khối chữ số chỉ giảm 1×10⁻⁶ (2/5 fold),
+#   tức là thừa và có thể bỏ.
+# - Với LASSO trên L1 (embedded, 91 hệ số), C = 0,05 giữ 77 hệ số và gần như không mất gì (−1,5×10⁻⁵); C = 0,01 giữ 67
+#   (−1,1×10⁻⁴); C = 0,002 giữ 57 (−8,5×10⁻⁴); C = 0,0005 giữ 36 (−0,0035). Có thể bỏ khoảng 15% hệ số mà không giảm
+#   AUC, nhưng bỏ nhiều hơn thì AUC giảm nhanh. (Solver saga chạy 100 vòng, chưa hội tụ hẳn ở C lớn.)
+# - Với 700 nghìn dòng, LR không bị overfit vì thừa feature, nên ở đây feature selection chủ yếu giúp hiểu khối nào
+#   quan trọng chứ không làm tăng điểm.
 
 # %% [markdown]
 # ## 5. LightGBM: cùng bậc thang và cùng các nhánh (chạy trên Kaggle)
-# Script `exp/kaggle/E2_lgb.py`, kernel `cs116-e2-lightgbm-ladder` (CPU). Tham số giống `A_lgb`, learning rate 0,05
-# cho bậc thang và các nhánh; bậc cuối chạy lại với 0,02 đúng như khi thi.
+# Chạy bằng script `exp/kaggle/E2_lgb.py` trên Kaggle (kernel `cs116-e2-lightgbm-ladder`, CPU). Tham số giống `A_lgb`;
+# bậc thang và các nhánh dùng learning rate 0,05, riêng bậc cuối chạy lại với 0,02 như khi thi.
 
 # %%
 lgb_path = RESULTS_DIR / "E2_lgb" / "E2_lgb.csv"
@@ -448,8 +454,8 @@ lgb_res = pd.read_csv(lgb_path) if lgb_path.exists() else None
 lgb_res[["group", "variant", "cv_auc", "delta_cv", "folds_up", "n_features", "trees_mean", "minutes"]]
 
 # %% [markdown]
-# ### Cùng một bước tiền xử lý, hai mô hình
-# Chênh lệch CV khi áp dụng từng bước (so với nền của mỗi mô hình): LR dùng nền L0 / L1, LightGBM dùng bậc 0 (21 cột gốc).
+# ### Cùng một bước tiền xử lý, hai model
+# Chênh lệch CV khi áp dụng từng bước (so với nền của mỗi model): LR dùng nền L0 / L1, LightGBM dùng bậc 0 (21 cột gốc).
 
 # %%
 lr_t = pd.read_csv(RESULTS_DIR / f"{EXP}.csv").set_index("variant")
@@ -512,18 +518,20 @@ P.save(fig, "E2_01_ladder")
 
 # %% [markdown]
 # **Nhận xét mục 5**
-# - **Bậc thang LightGBM:** 0,95873 → 0,96084 (+0,0021) qua 5 bậc, mọi bậc giữ lại đều 5/5 fold. Bậc lớn nhất là
-#   target encoding trong fold (+0,00070), rồi chữ số (+0,00058) và dữ liệu gốc (+0,00048).
-# - Bậc 5 (tra cứu cả bộ điểm trên dữ liệu gốc, 2/5 fold) và bậc 6 (feature nghiệp vụ: tổng delay, số điểm 0, trung bình
-#   điểm…, 3/5 fold) **không tăng**: khớp với kết luận khi thi. Feature nghiệp vụ cây tự tách được từ các cột gốc.
-# - **Tái lập:** bậc cuối (lr 0,02) đạt 0,960889, so với `A_lgb` khi thi 0,960893 (chênh 4e-6; chênh từng fold có cả âm
-#   lẫn dương ±1e-4, nhỏ hơn nhiễu giữa hai seed). lr 0,02 hơn lr 0,05 khoảng +0,00005 nhưng cần gấp đôi số cây.
-# - **Các nhánh tiền xử lý đều trong ±0,00005** và không nhất quán theo fold: cây chia nhánh theo thứ tự giá trị nên
-#   không nhạy với log1p, chuẩn hoá hay cắt ngưỡng; giá trị thiếu LightGBM tự xử lý; mã hoá category cũng gần như không
-#   đổi gì.
-# - **Bảng "cùng một bước, hai mô hình"** cho thấy rõ: mã hoá điểm thành biến phân loại +0,027 với LR nhưng −0,00004 với
-#   LightGBM; log1p +0,00017 với LR nhưng −0,00001 với LightGBM. Ngược lại, chữ số và tần suất +0,0008 với LightGBM nhưng
-#   ≈ 0 với LR.
+# - Qua 5 bậc, CV của LightGBM tăng từ 0,95873 lên 0,96084 (+0,0021), mọi bậc được giữ đều tăng ở 5/5 fold. Bậc lớn
+#   nhất là target encoding trong fold (+7,0×10⁻⁴), sau đó là chữ số (+5,8×10⁻⁴) và dữ liệu gốc (+4,8×10⁻⁴).
+# - Bậc 5 (tra cứu cả bộ điểm trên dữ liệu gốc, 2/5 fold) và bậc 6 (feature nghiệp vụ như tổng delay, số điểm 0, trung
+#   bình điểm, 3/5 fold) không làm CV tăng, giống kết luận khi thi. Có thể cây đã tự tách được các feature nghiệp vụ
+#   này từ cột gốc.
+# - Về tái lập, bậc cuối (learning rate 0,02) đạt 0,960889 so với 0,960893 của `A_lgb` khi thi (chênh 4×10⁻⁶; chênh
+#   từng fold có cả âm lẫn dương, trong ±1×10⁻⁴, nhỏ hơn nhiễu giữa hai seed). Learning rate 0,02 cao hơn 0,05 khoảng
+#   5×10⁻⁵ nhưng cần gấp đôi số cây.
+# - Mọi nhánh tiền xử lý đều chỉ làm CV thay đổi trong ±5×10⁻⁵ và không nhất quán giữa các fold. Cây chia nhánh theo
+#   thứ tự giá trị nên không nhạy với log1p, chuẩn hoá hay cắt ngưỡng; LightGBM tự xử lý giá trị thiếu; cách mã hoá
+#   category cũng gần như không ảnh hưởng.
+# - Bảng "cùng một bước, hai model" cho thấy cùng một bước có tác dụng rất khác nhau. Mã hoá điểm thành biến phân loại
+#   tăng 0,027 với LR nhưng giảm 4×10⁻⁵ với LightGBM; log1p tăng 1,7×10⁻⁴ với LR nhưng giảm 1×10⁻⁵ với LightGBM. Ngược
+#   lại, chữ số và tần suất tăng 8×10⁻⁴ với LightGBM nhưng gần như 0 với LR.
 
 # %% [markdown]
 # ## 6. Tóm tắt và quyết định
@@ -532,12 +540,12 @@ P.save(fig, "E2_01_ladder")
 # | --- | --- | --- |
 # | Baseline → bộ đầy đủ | 0,9217 → 0,9597 (+0,038) | 0,9587 → 0,9609 (+0,002) |
 # | Bước quan trọng nhất | mã hoá điểm one-hot (+0,027), dữ liệu gốc (+0,006) | TE trong fold, chữ số, dữ liệu gốc (+0,0005–0,0007 mỗi bước) |
-# | Điền thiếu, log1p, chuẩn hoá, cắt ngoại lệ | log1p có ích; chuẩn hoá chỉ làm nhanh hơn ×43 | không tác dụng (±0,00005) |
+# | Điền thiếu, log1p, chuẩn hoá, cắt ngoại lệ | log1p có ích; chuẩn hoá chỉ làm nhanh hơn ×43 | không tác dụng (±5×10⁻⁵) |
 # | Tái lập model khi thi | 0,959727 so với 0,959737 | 0,960889 so với 0,960893 |
 #
 # **Quyết định:**
-# 1. Tiền xử lý **theo mô hình**: mô hình tuyến tính / mạng nơ-ron dùng dạng L1 (one-hot điểm và category, log1p delay,
-#    z-score); mô hình cây dùng 21 cột gốc, category để dạng `category`. Dùng ở E3.
+# 1. Tiền xử lý tuỳ theo loại model. Model tuyến tính và mạng nơ-ron dùng dạng L1 (one-hot điểm và category, log1p
+#    delay, z-score); model cây dùng 21 cột gốc, category để kiểu `category`. Áp dụng ở E3.
 # 2. Bộ feature đầy đủ của LightGBM = bậc 4 + teacher (`src/features.py`, step 4, teachers=True).
 # 3. Không xoá dòng ngoại lệ, không cần imputer phức tạp; chọn feature bằng CV, không bằng AUC một cột.
 #
@@ -545,12 +553,12 @@ P.save(fig, "E2_01_ladder")
 #
 # | Ý tưởng | Thời điểm | Δ CV | Số fold tăng | Lý do không giữ |
 # | --- | --- | --- | --- | --- |
-# | Ghép 129 nghìn dòng dữ liệu gốc vào phần train của fold (LightGBM) | 18/10 | +0,0001 (model đơn), 0 vào stack | – | lợi ích nhỏ, không thêm thông tin cho stack |
+# | Ghép 129 nghìn dòng dữ liệu gốc vào phần train của fold (LightGBM) | 18/10 | +1×10⁻⁴ (model đơn), 0 khi vào stack | – | lợi ích nhỏ, không thêm thông tin cho stack |
 # | Ghép dòng gốc với trọng số 0,35 (XGBoost của nhóm) | 17/10 | 0,95853, thấp hơn bản dùng teacher (0,96094) | – | teacher tốt hơn ghép dòng |
-# | LightGBM bậc 5: tra cứu bộ điểm trên dữ liệu gốc | 14/10, kiểm chứng | +0,000001 | 2/5 | dưới nhiễu |
-# | LightGBM bậc 6: feature nghiệp vụ | 14/10, kiểm chứng | +0,000018 | 3/5 | dưới nhiễu, cây tự tách được |
-# | LR: chữ số, tần suất (L4) | kiểm chứng | +0,000003 | 3/5 | không có tác dụng với mô hình tuyến tính |
-# | LR: tổng hợp điểm, KMeans, PCA trên bộ đầy đủ | kiểm chứng | +0,000028 | 5/5 | quá nhỏ, thông tin đã có sẵn |
+# | LightGBM bậc 5: tra cứu bộ điểm trên dữ liệu gốc | 14/10, kiểm chứng | +1×10⁻⁶ | 2/5 | dưới nhiễu |
+# | LightGBM bậc 6: feature nghiệp vụ | 14/10, kiểm chứng | +1,8×10⁻⁵ | 3/5 | dưới nhiễu |
+# | LR: chữ số, tần suất (L4) | kiểm chứng | +3×10⁻⁶ | 3/5 | không có tác dụng với model tuyến tính |
+# | LR: tổng hợp điểm, KMeans, PCA trên bộ đầy đủ | kiểm chứng | +2,8×10⁻⁵ | 5/5 | quá nhỏ, thông tin đã có sẵn |
 # | LR: PCA 5 thành phần | kiểm chứng | ≈ 0 | 3/5 | biến đổi tuyến tính, LR tự làm được |
-# | Mọi nhánh điền thiếu, cắt ngoại lệ, chuẩn hoá (cả hai mô hình) | kiểm chứng | ±0,00005 | không nhất quán | dữ liệu thiếu rất ít; cây không nhạy |
+# | Mọi nhánh điền thiếu, cắt ngoại lệ, chuẩn hoá (cả hai model) | kiểm chứng | ±5×10⁻⁵ | không nhất quán | dữ liệu thiếu rất ít; cây không nhạy |
 # | Bỏ 5 cột yếu nhất theo AUC một cột | kiểm chứng | −0,0014 | 0/5 | cột yếu riêng lẻ vẫn có ích khi kết hợp |

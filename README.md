@@ -2,7 +2,7 @@
 
 Đồ án môn CS116 (Lập trình Python cho máy học), nhóm **Everhope**.
 
-- Cuộc thi: [playground-series-s6e10](https://www.kaggle.com/competitions/playground-series-s6e10): phân loại nhị phân, dự đoán xác suất hành khách hài lòng.
+- Cuộc thi: [playground-series-s6e10](https://www.kaggle.com/competitions/playground-series-s6e10), bài toán phân loại nhị phân: dự đoán xác suất hành khách hài lòng.
 - Metric: **ROC AUC**.
 - Kết quả: **hạng 66 / ~3748 đội trên private LB** (AUC 0,96239), top ~1,8%; public LB 0,96190.
 
@@ -20,10 +20,10 @@
 │   └── make_folds.py  # đã chạy một lần để tạo data/folds.csv
 ├── exp/               # các thí nghiệm, xem exp/README.md
 │   ├── E0_setup.py / .ipynb, E1_eda.py / .ipynb, …   # mỗi mục: script (.py) và notebook đã chạy (.ipynb)
-│   ├── kaggle/        # phần chạy trên Kaggle (E2_lgb.py, E3_models.py)
+│   ├── kaggle/        # phần chạy trên Kaggle (E2_lgb.py, E3_models.py, E4_tuning.py)
 │   ├── competition/   # code gốc khi thi (lưu tra cứu) + reproduce_final.py tái tạo file nộp
 │   └── tools/         # py2nb.py, kaggle_bundle.py, build_competition_log.py
-├── results/           # bảng kết quả: E0_*.csv, E1_*.csv, E2_lr.csv, E2_lgb/, E3_models/, competition_*.csv
+├── results/           # bảng kết quả E0–E6 (E2_lgb/, E3_models/, E4_tuning/: output Kaggle), competition_*.csv
 └── reports/figures/   # hình cho báo cáo: E0_*.png, E1_*.png, …
 ```
 
@@ -47,4 +47,4 @@ Tải dữ liệu theo `data/README.md`. Các thí nghiệm nặng (GPU, model l
 
 ## Nguồn tham khảo
 
-Lớp stack cuối dùng bộ OOF công khai của cộng đồng và công thức stack công khai; ghi nguồn chi tiết trong báo cáo và trong `exp/E5_*`.
+Bài nộp cuối dùng stacking trên pool OOF công khai của cộng đồng Kaggle và công thức stacking công khai; nguồn ghi ở `exp/competition/README.md`. Tài liệu học thuật và bảng thuật ngữ ở `exp/README.md`.

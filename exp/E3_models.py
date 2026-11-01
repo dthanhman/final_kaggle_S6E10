@@ -1,22 +1,22 @@
 # %% [markdown]
-# # E3. Huấn luyện và so sánh mô hình
+# # E3. Huấn luyện và so sánh model
 #
-# Bước **Model training / evaluation** của ML pipeline: cùng dữ liệu, cùng 5 fold (`data/folds.csv`), so sánh các họ
-# mô hình phân lớp của Bài 07 (Naive Bayes, cây quyết định, SVM, Logistic Regression), Bài 08 (bagging, boosting) và
-# mạng nơ-ron; đo **bias / variance** (khoảng cách AUC train và AUC validation) và **learning curve**.
+# Đây là bước Model training và evaluation của ML pipeline. Trên cùng dữ liệu và cùng 5 fold (`data/folds.csv`), nhóm
+# so sánh các họ model phân lớp của Bài 07 (Naive Bayes, cây quyết định, SVM, Logistic Regression), Bài 08 (bagging,
+# boosting) và mạng nơ-ron, đồng thời đo bias / variance (khoảng cách giữa AUC train và AUC validation) và learning
+# curve.
 #
-# > **Trong cuộc thi.** Sau LightGBM đầu tiên (14/10), nhóm train thêm nhiều loại mô hình khác (15–25/10): Logistic
-# > Regression, kNN, TabM, Factorization Machine, FT-Transformer, TabPFN, mô hình ngôn ngữ GPT-2, XGBoost / CatBoost
-# > có teacher từ dữ liệu gốc, RealMLP, và Q-FT (transformer tự viết, tiền huấn luyện rồi fine-tune). Mục tiêu không
-# > phải tìm một model đơn tốt nhất mà tìm model **khác biệt** để stack (E5). Mục 1 tổng hợp các model đó.
+# > **Trong cuộc thi.** Sau model LightGBM đầu tiên (14/10), từ 15 đến 25/10 nhóm train thêm nhiều loại model khác:
+# > Logistic Regression, kNN, TabM, Factorization Machine, FT-Transformer, TabPFN, GPT-2, XGBoost và CatBoost dùng
+# > teacher từ dữ liệu gốc, RealMLP, và Q-FT (transformer nhóm tự viết, tiền huấn luyện rồi fine-tune). Mục đích lúc
+# > đó là tìm model khác biệt để đưa vào stacking (E5) hơn là tìm một model đơn tốt nhất. Mục 1 tổng hợp các model này.
 #
 # Nội dung:
-# 1. Các mô hình nhóm đã train khi thi: CV, tương quan với LightGBM, đóng góp vào stack của nhóm
-# 2. So sánh hệ thống trên cùng đầu vào: 11 mô hình (máy cá nhân + Kaggle)
-# 3. Bias / variance: độ sâu cây quyết định, khoảng cách train – CV
-# 4. Learning curve của LightGBM
-# 5. Tương quan giữa các mô hình
-# 6. Tóm tắt và quyết định
+# 1. Các model nhóm đã train khi thi: CV, tương quan với LightGBM, đóng góp vào stacking
+# 2. So sánh 14 model trên cùng đầu vào (chạy trên máy cá nhân và Kaggle), kèm bias / variance theo độ sâu cây
+# 3. Learning curve của LightGBM
+# 4. Tương quan giữa các model
+# 5. Tóm tắt và quyết định
 
 # %%
 import sys
@@ -56,13 +56,15 @@ KAGGLE_DIR = RESULTS_DIR / "E3_models"  # output kernel thanhmn123/cs116-e3-mode
 COMP_OOF = Path(os.environ.get("COMP_OOF_DIR", ROOT.parent / "DoAn" / "oof"))  # OOF lưu khi thi
 
 # %% [markdown]
-# ## 1. Các mô hình nhóm đã train khi thi
+# ## 1. Các model nhóm đã train khi thi
 #
-# Đọc lại file OOF lưu khi thi (cả 3 thành viên, cùng `folds.csv`). **Chỉ OOF sạch được đưa vào stack** (luật E0): bỏ
-# hai file dừng sớm trên fold đang chấm, `A_kozy_esval_v1` (chỉ dùng để đo khi thi) và Dual-Specialist LightGBM (vẫn có
-# một dòng trong bảng để ghi AUC). Với mỗi họ mô hình ghi: model đại diện, CV AUC, tương quan rank với LightGBM của
-# nhóm, và **Δ stack khi bỏ cả họ**: stack LR trên logit của 25 OOF sạch (`src/blend.py`, C = 0,003), bỏ mọi file của họ đó rồi đo lại, trên 2 cách chia meta fold
-# (`folds.csv` và seed 7). Δ âm nghĩa là họ đó có đóng góp.
+# Phần này đọc lại các file OOF lưu khi thi của cả 3 thành viên (cùng `folds.csv`). Theo quy ước ở E0, chỉ OOF sạch
+# được đưa vào stacking, nên hai file early stopping trên fold đang chấm bị loại: `A_kozy_esval_v1` (khi thi chỉ dùng
+# để đo ảnh hưởng của lỗi này) và Dual-Specialist LightGBM (vẫn có một dòng trong bảng để ghi AUC).
+#
+# Với mỗi họ model, bảng ghi model đại diện, CV AUC, tương quan rank với LightGBM của nhóm và Δ stack khi bỏ cả họ. Δ
+# được tính như sau: stacking bằng LR trên logit của 25 OOF sạch (`src/blend.py`, C = 0,003), bỏ mọi file của họ đó rồi
+# đo lại, trên 2 cách chia meta fold (`folds.csv` và seed 7). Δ âm nghĩa là họ đó có đóng góp.
 #
 # Kết quả tính một lần rồi lưu `results/E3_competition_models.csv` (OOF khi thi không nằm trong repo này).
 
@@ -135,8 +137,9 @@ print(f"Stack LR {int(full['n_oof'])} OOF sạch của nhóm: {full['folds.csv']
 comp.sort_values("cv_auc", ascending=False).set_index("họ")
 
 # %% [markdown]
-# Mọi file OOF trong bảng đều có code trong `exp/competition/code/`, trừ `A_qft2_v2avg`: khi thi file này được tính tay
-# bằng trung bình logit của hai seed Q-FT (`A_qft2.py`, seed 42 và seed 7). Ô dưới tính lại và so với file đã dùng.
+# Mọi file OOF trong bảng đều có code trong `exp/competition/code/`, trừ `A_qft2_v2avg`. Khi thi, file này được tính
+# trực tiếp bằng trung bình logit của hai seed Q-FT (`A_qft2.py`, seed 42 và seed 7). Ô dưới tính lại và so với file
+# đã dùng.
 
 # %%
 def qft2_avg(part):
@@ -156,33 +159,33 @@ if (COMP_OOF / "oof_A_qft2_v2avg.npy").exists():
 
 # %% [markdown]
 # **Nhận xét mục 1**
-# - **Stack 25 OOF sạch của nhóm: 0,961619** (meta fold seed 7: 0,961626), hơn LightGBM đơn của nhóm (0,960893)
-#   +0,00073 và hơn model đơn tốt nhất (Q-FT v2, 0,961091) +0,00053.
-# - **Q-FT đóng góp gần như toàn bộ**: bỏ cả họ thì stack giảm 0,000225 (ổn định ở cả 2 cách chia meta fold), gấp
-#   4 lần họ thứ hai. Tương quan rank của Q-FT với LightGBM vẫn cao (0,966) nhưng nó học theo cách khác hẳn
-#   (tiền huấn luyện tự giám sát rồi fine-tune), nên phần sai của nó ít trùng với cây.
-# - Chỉ thêm 4 họ khác có Δ ≤ −1e-5: LightGBM (−0,000051), XGBoost / CatBoost dùng dữ liệu gốc (−0,000027), LR + token
-#   GPT-2 (−0,000016), LR (−0,000011). Các họ còn lại nằm trong ±6e-6, **dưới ngưỡng 3e-5** nhóm dùng khi thi để giữ
-#   một thay đổi (E0): bỏ hay giữ không phân biệt được.
-# - **AUC riêng cao không có nghĩa là có ích cho stack**: FT-Transformer (0,96005, model nơ-ron mạnh thứ hai) và TabM
-#   (0,95954) đều Δ ≈ +5e-6, vì tương quan với LightGBM cao (0,946–0,966) mà không có thông tin mới. Ngược lại kNN
-#   tương quan thấp nhất (0,867) nhưng AUC quá thấp (0,9503) nên cũng không giúp. Member có ích phải **vừa đủ mạnh vừa
-#   khác biệt**.
-# - Dual-Specialist LightGBM chỉ ghi AUC, không đưa vào stack: early stopping trên fold đang chấm. `A_kozy_esval_v1`
-#   (bản đo ảnh hưởng của lỗi đó) cũng bị bỏ. `A_lgb_v1` có lỗi đảo hai cột Flight Distance / Age khi tạo feature,
-#   nhưng OOF vẫn sạch nên được giữ, đúng như khi thi.
+# - Stacking 25 OOF sạch của nhóm đạt **0,961619** (0,961626 với meta fold seed 7), cao hơn LightGBM đơn của nhóm
+#   (0,960893) 7,3×10⁻⁴ và cao hơn model đơn tốt nhất (Q-FT v2, 0,961091) 5,3×10⁻⁴.
+# - Q-FT đóng góp nhiều nhất. Bỏ cả họ Q-FT thì AUC của stacking giảm 2,25×10⁻⁴, như nhau ở cả 2 cách chia meta fold,
+#   gấp khoảng 4 lần họ đứng thứ hai. Tương quan rank giữa Q-FT và LightGBM vẫn cao (0,966); một cách giải thích có thể
+#   là Q-FT học theo cách khác (tiền huấn luyện tự giám sát rồi fine-tune) nên sai ở những dòng khác với model cây,
+#   nhưng phần này nhóm chưa kiểm chứng trực tiếp.
+# - Ngoài Q-FT, chỉ 4 họ có Δ từ −1×10⁻⁵ trở xuống: LightGBM (−5,1×10⁻⁵), XGBoost / CatBoost dùng dữ liệu gốc
+#   (−2,7×10⁻⁵), LR + token GPT-2 (−1,6×10⁻⁵) và LR (−1,1×10⁻⁵). Các họ còn lại nằm trong ±6×10⁻⁶, nhỏ hơn ngưỡng
+#   3×10⁻⁵ nhóm dùng khi thi (E0), nên không phân biệt được bỏ hay giữ.
+# - AUC riêng cao chưa chắc giúp được stacking. FT-Transformer (0,96005, model nơ-ron mạnh thứ hai) và TabM (0,95954)
+#   đều có Δ khoảng +5×10⁻⁶, trong khi tương quan với LightGBM khá cao (0,946–0,966). Ngược lại kNN có tương quan thấp
+#   nhất (0,867) nhưng AUC quá thấp (0,9503) nên cũng không giúp.
+# - Dual-Specialist LightGBM chỉ được ghi AUC, không đưa vào stacking vì early stopping trên fold đang chấm.
+#   `A_lgb_v1` có lỗi đảo hai cột Flight Distance và Age khi tạo feature, nhưng OOF vẫn sạch nên được giữ như khi thi.
 
 # %% [markdown]
-# ## 2. So sánh hệ thống trên cùng đầu vào
+# ## 2. So sánh model trên cùng đầu vào
 #
-# Không dùng feature tạo thêm của E2, để so sánh **mô hình** chứ không so sánh feature. Hai dạng đầu vào theo quyết
-# định E2:
-# - **dạng cây**: 21 cột gốc (category để dạng `category` hoặc mã số);
-# - **dạng tuyến tính** (L1 của E2): one-hot 4 category và 13 cột điểm, log1p delay, z-score Age / Flight Distance / delay.
+# Phần này không dùng các feature tạo thêm ở E2, để chênh lệch chỉ đến từ model. Theo quyết định ở E2 có hai dạng đầu
+# vào:
+# - dạng cho model cây: 21 cột gốc (category để kiểu `category` hoặc mã số);
+# - dạng cho model tuyến tính (L1 của E2): one-hot 4 cột category và 13 cột điểm, log1p delay, z-score cho Age,
+#   Flight Distance và delay.
 #
-# Không tinh chỉnh tham số (để E4). Với mỗi mô hình ghi CV AUC, **AUC trên dữ liệu train** (mẫu 100 nghìn dòng của
-# phần train fold) và thời gian. Boosting, bagging và MLP chạy trên Kaggle (`exp/kaggle/E3_models.py`, CPU 4 luồng);
-# Naive Bayes, cây quyết định, SVM, Logistic Regression chạy trên máy cá nhân (ô dưới, có cache).
+# Tham số chưa được tinh chỉnh (để dành cho E4). Với mỗi model, bảng ghi CV AUC, AUC trên dữ liệu train (mẫu 100 nghìn
+# dòng của phần train fold) và thời gian chạy. Boosting, bagging và MLP chạy trên Kaggle (`exp/kaggle/E3_models.py`,
+# CPU 4 luồng); Naive Bayes, cây quyết định, SVM và Logistic Regression chạy trên máy cá nhân (ô dưới, có cache).
 
 # %%
 def linear_frame(train, test):
@@ -289,8 +292,8 @@ evaluate("rbf_svm", "SVM", NystroemSVM, Xl, Xl_te, fit_n=200_000,
 
 # %% [markdown]
 # ### 2.1 Cây quyết định: độ sâu và bias / variance (Bài 07)
-# Quét `max_depth` của một cây đơn trên 21 cột mã số. Cây nông: bias cao (AUC train và CV đều thấp); cây sâu:
-# variance cao (train ≈ 1, CV giảm). Độ sâu tốt nhất được dùng làm mô hình "cây quyết định" ở bảng so sánh.
+# Thay đổi `max_depth` của một cây đơn trên 21 cột mã số. Độ sâu cho CV cao nhất được dùng làm model "cây quyết
+# định" trong bảng so sánh.
 
 # %%
 DEPTH = RESULTS_DIR / "E3_tree_depth.csv"
@@ -338,15 +341,15 @@ P.save(fig, "E3_01_tree_depth")
 
 # %% [markdown]
 # **Nhận xét 2.1**
-# - Cây nông **underfit**: sâu 2 chỉ 4 lá, AUC train và CV cùng ≈ 0,875. Khoảng cách train – CV gần 0 nhưng cả hai đều
-#   thấp: lỗi do bias.
-# - CV tăng tới **sâu 10 (0,9513, 722 lá)** rồi giảm dần. Từ sâu 12 trở đi AUC train vẫn tăng còn CV giảm: lỗi do
-#   variance. Cây không giới hạn có 63 nghìn lá, **AUC train = 1,0 nhưng CV chỉ 0,864**: học thuộc dữ liệu train.
-# - Điểm tốt nhất nằm ở chỗ cân bằng hai loại lỗi, đúng như đường cong bias – variance của Bài 07. Các mục sau xem
-#   bagging và boosting giảm từng loại lỗi đó thế nào.
+# - Cây nông bị underfit. Ở độ sâu 2 cây chỉ có 4 lá, AUC train và CV cùng khoảng 0,875; khoảng cách train – CV gần
+#   bằng 0 nhưng cả hai đều thấp, tức lỗi chủ yếu do bias.
+# - CV tăng tới độ sâu 10 (**0,9513**, 722 lá) rồi giảm dần. Từ độ sâu 12 trở đi AUC train vẫn tăng còn CV giảm, tức
+#   lỗi chủ yếu do variance. Cây không giới hạn có 63 nghìn lá, **AUC train bằng 1,0 nhưng CV chỉ 0,864**.
+# - Độ sâu tốt nhất nằm ở chỗ cân bằng hai loại lỗi, khớp với đường cong bias – variance trong Bài 07. Mục 2.2 xem
+#   bagging và boosting xử lý hai loại lỗi này như thế nào.
 
 # %% [markdown]
-# ### 2.2 Bảng so sánh 11 mô hình
+# ### 2.2 Bảng so sánh 14 model
 
 # %%
 kag = pd.read_csv(KAGGLE_DIR / "E3_models.csv")
@@ -399,27 +402,29 @@ P.save(fig, "E3_02_models")
 
 # %% [markdown]
 # **Nhận xét 2.2**
-# - **Boosting đứng đầu và gần như ngang nhau**: LightGBM 0,95860, XGBoost 0,95859, CatBoost 0,95856, HistGB 0,95824.
-#   Chênh nhau 3e-5, nhỏ hơn độ lệch giữa các fold (6e-4), nên không có thư viện nào "tốt hơn" thật sự. CatBoost chậm
-#   hơn gần 10 lần (29 phút so với 3 phút trên CPU).
-# - **Bagging** (Random Forest 0,95655, Extra Trees 0,95609) có khoảng cách train – CV lớn nhất (0,027–0,032) nhưng CV vẫn
-#   cao: mỗi cây overfit, trung bình 300 cây làm giảm variance. Boosting đi theo hướng ngược lại: cây nhỏ, giảm dần
-#   bias, khoảng cách chỉ 0,006–0,010.
-# - **Một cây quyết định** (0,9513) thua Random Forest 0,0053 và LightGBM 0,0073: đây là lợi ích của ensemble (Bài 08).
-# - **MLP** 0,95616 trên dạng L1, ngang Extra Trees, khoảng cách train – CV nhỏ (0,006) nhờ early stopping.
-# - **Mô hình tuyến tính** (LR 0,94868, SVM tuyến tính 0,94763) gần như không overfit (khoảng cách 2e-4) nhưng bias cao:
-#   không tự học được tương tác giữa các cột. SVM kernel RBF (Nyström) thêm phi tuyến, tăng lên 0,95179 dù chỉ fit trên
-#   200 nghìn dòng. Hinge loss (SVM) và log loss (LR) cho kết quả gần nhau: thứ hạng mới quan trọng với AUC.
-# - **Naive Bayes** thấp nhất (categorical 0,9309, Gaussian 0,9100): giả thiết các cột độc lập khi biết nhãn sai rõ, vì 13
-#   cột điểm tương quan mạnh với nhau (E1). Bản categorical tốt hơn Gaussian vì điểm 0–5 là biến rời rạc, không có phân
-#   phối chuẩn.
-# - So với E2: trên cùng 21 cột, LR thua LightGBM 0,0099; sau feature engineering của E2, LR (0,95973) lại vượt LightGBM
-#   chưa có feature (0,95860). Feature engineering nâng LR +0,011 nhưng LightGBM chỉ +0,002: phần lớn công sức tạo
-#   feature là để bù cho mô hình tuyến tính không tự học được tương tác.
+# - Bốn model boosting đứng đầu và gần như ngang nhau: LightGBM 0,95860, XGBoost 0,95859, CatBoost 0,95856, HistGB
+#   0,95824. Ba thư viện đầu chỉ chênh nhau 4×10⁻⁵, nhỏ hơn nhiều so với độ lệch chuẩn giữa các fold (6×10⁻⁴), nên
+#   không thể nói thư viện nào tốt hơn. CatBoost chạy chậm hơn gần 10 lần (29 phút so với 3 phút trên CPU).
+# - Hai model bagging (Random Forest 0,95655, Extra Trees 0,95609) có khoảng cách train – CV lớn nhất (0,027–0,032)
+#   nhưng CV vẫn cao. Từng cây overfit, nhưng lấy trung bình 300 cây làm giảm variance. Boosting thì ngược lại, dùng
+#   nhiều cây nhỏ để giảm dần bias, và khoảng cách train – CV chỉ 0,006–0,010.
+# - Một cây quyết định (0,9513) thấp hơn Random Forest 0,0053 và LightGBM 0,0073; đây là mức lợi của ensemble so với
+#   một cây (Bài 08).
+# - MLP đạt 0,95616 trên dạng L1, ngang Extra Trees, với khoảng cách train – CV nhỏ (0,006).
+# - Hai model tuyến tính (LR 0,94868, SVM tuyến tính 0,94763) gần như không overfit (khoảng cách 2×10⁻⁴) nhưng bias
+#   cao, vì không tự học được tương tác giữa các cột. SVM với kernel RBF (xấp xỉ Nyström) thêm được phần phi tuyến và
+#   tăng lên 0,95179 dù chỉ fit trên 200 nghìn dòng. Hinge loss (SVM) và log loss (LR) cho kết quả gần nhau.
+# - Naive Bayes thấp nhất (categorical 0,9309, Gaussian 0,9100). Giả thiết các cột độc lập khi biết nhãn không đúng ở
+#   đây, vì 13 cột điểm tương quan khá mạnh với nhau (E1). Bản categorical tốt hơn bản Gaussian vì điểm 0–5 là biến
+#   rời rạc, không có phân phối chuẩn.
+# - So với E2: trên cùng 21 cột, LR thấp hơn LightGBM 0,0099, nhưng sau khi thêm feature ở E2 thì LR (0,95973) lại cao
+#   hơn LightGBM chưa thêm feature (0,95860). Feature engineering nâng LR thêm 0,011 nhưng LightGBM chỉ 0,002, cho
+#   thấy phần lớn feature tạo thêm có tác dụng bù cho việc model tuyến tính không tự học được tương tác.
 
 # %% [markdown]
 # ## 3. Learning curve của LightGBM
-# LightGBM train trên 5% → 100% phần train của fold (25 nghìn → 504 nghìn dòng), chấm trên cả fold validation.
+# LightGBM được train trên 5% đến 100% phần train của fold (25 nghìn đến 504 nghìn dòng) và chấm trên cả fold
+# validation.
 
 # %%
 lc = pd.read_csv(KAGGLE_DIR / "E3_learning_curve.csv")
@@ -445,17 +450,16 @@ lc_tab.round(6)
 
 # %% [markdown]
 # **Nhận xét mục 3**
-# - Mỗi lần **gấp đôi dữ liệu** CV tăng 0,0010 → 0,0010 → 0,0007 → 0,0006: lợi ích giảm dần nhưng **chưa bão hoà** ở
-#   504 nghìn dòng. Khoảng cách train – CV thu hẹp từ 0,020 (25 nghìn dòng) xuống 0,010 (504 nghìn dòng): thêm dữ liệu
-#   chủ yếu giảm variance.
-# - Hệ quả cho cuộc thi: thêm dữ liệu cùng phân phối vẫn có ích. Điều này giải thích vì sao 129 nghìn dòng dữ liệu
-#   gốc giúp được (+0,0005 ở E2) dù phân phối delay lệch, và vì sao train trên toàn bộ train (không bỏ 10% cho early
-#   stopping) có thể thêm một chút.
+# - Mỗi lần gấp đôi dữ liệu, CV tăng lần lượt 0,0010, 0,0010, 0,0007 và 0,0006. Mức tăng giảm dần nhưng chưa bão hoà
+#   ở 504 nghìn dòng. Khoảng cách train – CV thu hẹp từ 0,020 (25 nghìn dòng) xuống 0,010 (504 nghìn dòng), tức thêm
+#   dữ liệu chủ yếu làm giảm variance.
+# - Như vậy với bài này, thêm dữ liệu cùng phân phối vẫn còn có ích. Đây có thể là một lý do khiến dữ liệu gốc giúp
+#   LightGBM tăng 4,8×10⁻⁴ ở E2 dù phân phối delay khác.
 
 # %% [markdown]
-# ## 4. Tương quan giữa các mô hình
-# Tương quan rank (Spearman) giữa OOF của các mô hình ở mục 2. Hai mô hình tương quan thấp mà AUC gần nhau là cặp
-# có ích cho stacking (E5).
+# ## 4. Tương quan giữa các model
+# Tương quan rank (Spearman) giữa OOF của các model ở mục 2. Hai model có AUC gần nhau nhưng tương quan thấp thường
+# là cặp có ích khi stacking (E5).
 
 # %%
 order = [n for n in allm["model"] if n not in ("decision_tree_full", "naive_bayes_gauss")]
@@ -481,46 +485,47 @@ P.save(fig, "E3_04_rank_corr")
 
 # %% [markdown]
 # **Nhận xét mục 4**
-# - Bốn mô hình boosting tương quan rank 0,97–0,98 với nhau: gần như cùng một mô hình, ghép lại không thêm thông tin.
-# - Các mô hình khác loại tương quan thấp hơn hẳn với LightGBM: MLP 0,917, Random Forest 0,929, SVM RBF 0,901, LR
-#   0,895, Naive Bayes 0,816. MLP là ứng viên tốt nhất cho stacking: AUC chỉ kém LightGBM 0,0024 mà tương quan thấp.
-# - Kết luận này khớp với cách nhóm làm khi thi (mục 1): tìm model **khác loại** chứ không thêm biến thể cây.
+# - Bốn model boosting tương quan rank 0,96–0,98 với nhau, nên ghép chúng lại khó thêm được thông tin.
+# - Các model khác loại tương quan với LightGBM thấp hơn: MLP 0,917, Random Forest 0,929, SVM RBF 0,901, LR 0,895,
+#   Naive Bayes 0,816. Trong số này MLP là ứng viên đáng chú ý cho stacking, vì AUC chỉ thấp hơn LightGBM 0,0024 trong
+#   khi tương quan thấp. E5 kiểm tra điều này.
 
 # %% [markdown]
 # ## 5. Tóm tắt và quyết định
 #
 # | | Kết quả |
 # | --- | --- |
-# | Mô hình đơn tốt nhất trên 21 cột gốc | boosting: LightGBM 0,95860 ≈ XGBoost ≈ CatBoost (chênh 4e-5 < độ lệch giữa fold) |
+# | Model đơn tốt nhất trên 21 cột gốc | boosting: LightGBM 0,95860 ≈ XGBoost ≈ CatBoost (chênh 4×10⁻⁵, nhỏ hơn độ lệch giữa fold) |
 # | Bias / variance | cây sâu 2: bias (0,875); cây không giới hạn: variance (train 1,0, CV 0,864); tốt nhất sâu 10 (0,9513) |
 # | Ensemble so với một cây | Random Forest +0,0053, LightGBM +0,0073 |
-# | Mô hình tuyến tính, SVM, Naive Bayes | LR 0,9487, SVM RBF 0,9518, Naive Bayes 0,910–0,931 |
+# | Model tuyến tính, SVM, Naive Bayes | LR 0,9487, SVM RBF 0,9518, Naive Bayes 0,910–0,931 |
 # | Learning curve | gấp đôi dữ liệu: +0,0010 → +0,0006, chưa bão hoà |
-# | Stack 25 OOF sạch của nhóm (khi thi) | 0,961619; Q-FT đóng góp 0,000225, các họ khác ≤ 0,00005 |
+# | Stacking 25 OOF sạch của nhóm (khi thi) | 0,961619; Q-FT đóng góp 2,25×10⁻⁴, các họ khác không quá 5×10⁻⁵ |
 #
 # **Quyết định:**
-# 1. **LightGBM** là mô hình chính để tinh chỉnh ở E4: ngang XGBoost / CatBoost về AUC, nhanh hơn CatBoost 10 lần.
-# 2. Model thêm vào stack được chọn theo **đóng góp vào stack** (Δ khi bỏ ra, ổn định qua nhiều meta seed), không
-#    theo AUC riêng. Ưu tiên model khác loại với cây (mạng nơ-ron, tiền huấn luyện) như Q-FT. Dùng ở E5.
-# 3. Chỉ OOF sạch được vào stack (luật E0), kể cả khi model đó của thành viên khác hoặc đã dùng khi thi.
+# 1. Dùng LightGBM làm model chính để tinh chỉnh ở E4, vì AUC ngang XGBoost và CatBoost nhưng chạy nhanh hơn CatBoost
+#    khoảng 10 lần.
+# 2. Model đưa vào stacking được chọn theo mức đóng góp cho stacking (Δ khi bỏ ra, ổn định qua nhiều meta seed), không
+#    theo AUC riêng. Ưu tiên model khác loại với cây (mạng nơ-ron, model có tiền huấn luyện) như Q-FT. Áp dụng ở E5.
+# 3. Chỉ OOF sạch được đưa vào stacking (quy ước E0), kể cả với model đã dùng khi thi.
 #
 # **Đã thử nhưng không giữ**
 #
 # | Ý tưởng | Thời điểm | Kết quả | Δ stack | Lý do không giữ |
 # | --- | --- | --- | --- | --- |
-# | kNN k=50 trên không gian feature tự chọn thang | 15/10, 18/10 | 0,9503 | +1e-6 / +6e-6 | AUC quá thấp dù tương quan thấp |
-# | Factorization Machine | 18/10 | 0,9572 | ±1e-6 | không có thông tin mới |
-# | TabM | 15/10 | 0,9595 | +4e-6 | tương quan cao với cây |
-# | FT-Transformer | 18/10 | 0,9601 | +5e-6 | như trên; AUC riêng cao không đủ |
-# | RealMLP-TD (pytabkit, rút còn 16 epoch) | 19/10 | 0,9577, tương quan 0,926 với LightGBM | ±1e-6 | AUC thấp vì train ngắn; chưa thử đủ epoch |
-# | GPT-2 phân loại dòng dạng văn bản | 19/10 | 0,9562 (5,8 giờ GPU) | −5e-6 / −3e-6 | dưới ngưỡng 3e-5, quá tốn |
-# | LLR: distilgpt2 sinh dòng theo nhãn, chỉ train trên dữ liệu gốc | 18/10 | 0,9515 | −3,5e-6 đến +0,4e-6 (stack khi thi) | dưới ngưỡng |
-# | TabPFN (context 300 nghìn dòng) | 16/10 | 0,9600 (fold 0) | −3,9e-6 đến −0,1e-6 (stack khi thi) | tương quan 0,993 với stack; OOM khi dùng cả 560 nghìn dòng |
-# | Chạy lại sạch một member công khai (LightGBM feature nghiệp vụ) | 19/10 | 0,9587 | 0 | lợi ích của bản gốc đến từ early stopping trên fold chấm |
-# | LightGBM trọng số ×3 cho Personal Travel | 18/10 | 0,9605; AUC Personal không tăng | −1e-6 (stack khi thi) | không cải thiện nhóm khó |
-# | Dual-Specialist LightGBM (2 nhánh Personal / Business) | 18/10 | 0,9586; AUC Personal giảm 0,8336 → 0,8284 | – | không sạch (early stopping trên fold chấm) |
-# | Q-FT v1 (khởi tạo mặc định) | 24/10 | 0,8292 | – | không học được (loss RTD đứng yên) |
-# | Q-FT v3 (fine-tune 4 epoch) | 25/10 | 0,9593, thấp hơn v2 ở 5/5 fold | – | overfit từ epoch 3 |
-# | Q-FT v4 (bỏ teacher LightGBM khỏi token) | 25/10 | 0,9610, thấp hơn v2 ở 4/5 fold | −0,9e-6 đến −0,2e-6 | không khác biệt hơn v2 |
+# | kNN k=50 trên không gian feature tự chọn thang | 15/10, 18/10 | 0,9503 | +1×10⁻⁶ / +6×10⁻⁶ | AUC quá thấp dù tương quan thấp |
+# | Factorization Machine | 18/10 | 0,9572 | ±1×10⁻⁶ | không thêm thông tin |
+# | TabM | 15/10 | 0,9595 | +4×10⁻⁶ | tương quan cao với model cây |
+# | FT-Transformer | 18/10 | 0,9601 | +5×10⁻⁶ | tương quan cao với model cây |
+# | RealMLP-TD (pytabkit, 16 epoch) | 19/10 | 0,9577, tương quan 0,926 với LightGBM | ±1×10⁻⁶ | AUC thấp, có thể do train ít epoch (chưa thử thêm) |
+# | GPT-2 phân loại dòng dạng văn bản | 19/10 | 0,9562 (5,8 giờ GPU) | −5×10⁻⁶ / −3×10⁻⁶ | dưới ngưỡng, chi phí cao |
+# | LLR: distilgpt2 sinh dòng theo nhãn, chỉ train trên dữ liệu gốc | 18/10 | 0,9515 | −3,5×10⁻⁶ đến +0,4×10⁻⁶ (stacking khi thi) | dưới ngưỡng |
+# | TabPFN (context 300 nghìn dòng) | 16/10 | 0,9600 (fold 0) | −3,9×10⁻⁶ đến −0,1×10⁻⁶ (stacking khi thi) | tương quan 0,993 với stacking; hết bộ nhớ GPU khi dùng cả 560 nghìn dòng |
+# | Chạy lại sạch một member công khai (LightGBM feature nghiệp vụ) | 19/10 | 0,9587 | 0 | bản sạch không giúp; phần lợi của bản gốc nhiều khả năng do early stopping trên fold đang chấm |
+# | LightGBM trọng số ×3 cho Personal Travel | 18/10 | 0,9605; AUC nhóm Personal không tăng | −1×10⁻⁶ (stacking khi thi) | không cải thiện nhóm khách khó |
+# | Dual-Specialist LightGBM (2 nhánh Personal / Business) | 18/10 | 0,9586; AUC nhóm Personal giảm từ 0,8336 xuống 0,8284 | – | không sạch (early stopping trên fold đang chấm) |
+# | Q-FT v1 (khởi tạo mặc định) | 24/10 | 0,8292 | – | không học được (loss tiền huấn luyện không giảm) |
+# | Q-FT v3 (fine-tune 4 epoch) | 25/10 | 0,9593, thấp hơn v2 ở 5/5 fold | – | AUC giảm ở epoch 4 (overfit) |
+# | Q-FT v4 (bỏ teacher LightGBM khỏi token) | 25/10 | 0,9610, thấp hơn v2 ở 4/5 fold | −0,9×10⁻⁶ đến −0,2×10⁻⁶ | không khác biệt hơn v2 |
 # | Cây quyết định không giới hạn độ sâu | kiểm chứng | 0,8641 (train 1,0) | – | overfit |
 # | Naive Bayes Gaussian / categorical | kiểm chứng | 0,9100 / 0,9309 | – | giả thiết độc lập sai: các cột điểm tương quan mạnh |

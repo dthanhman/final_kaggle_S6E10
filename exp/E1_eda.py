@@ -1,14 +1,14 @@
 # %% [markdown]
 # # E1. Phân tích khám phá dữ liệu (EDA)
 #
-# Bước **Data validation** trong ML pipeline (Bài 03): hiểu dữ liệu, kiểm tra chất lượng (thiếu, trùng, ngoại lệ),
-# tìm quan hệ giữa các cột và với nhãn, kiểm tra train và test có cùng phân phối không. Mỗi phát hiện dẫn tới một
-# lựa chọn tiền xử lý được kiểm chứng bằng CV ở **E2**.
+# Đây là bước Data validation trong ML pipeline (Bài 03). Nhóm tìm hiểu dữ liệu, kiểm tra chất lượng (giá trị thiếu,
+# dòng trùng, ngoại lệ), xem quan hệ giữa các cột và với nhãn, và kiểm tra train với test có cùng phân phối hay không.
+# Các lựa chọn tiền xử lý rút ra từ đây được kiểm chứng bằng CV ở E2.
 #
-# > **Trong cuộc thi.** EDA đầu tiên làm ngày 12–13/10 (mục 1, 2, 4, 5, 7); so sánh dữ liệu gốc và dữ liệu cuộc thi
-# > làm ngày 15/10 (mục 8). Các phát hiện về điểm 0, delay và tương tác `Type of Travel` × `Class` được dùng khi xây
-# > bộ feature của model đầu tiên (`A_lgb`, 14/10). Bản này bổ sung phát hiện ngoại lệ (IQR, z-score), phân tích giá
-# > trị thiếu và phân tích đa biến không giám sát (PCA, t-SNE, KMeans) theo Bài 03, 04, 06.
+# > **Trong cuộc thi.** EDA đầu tiên làm ngày 12–13/10 (mục 1, 2, 4, 5, 7); phần so sánh dữ liệu gốc với dữ liệu
+# > cuộc thi làm ngày 15/10 (mục 8). Các phát hiện về điểm 0, delay và tương tác `Type of Travel` × `Class` được dùng
+# > khi xây bộ feature của model đầu tiên (`A_lgb`, 14/10). Bản này bổ sung phát hiện ngoại lệ (IQR, z-score), phân
+# > tích giá trị thiếu và phân tích đa biến không giám sát (PCA, t-SNE, KMeans) theo Bài 03, 04 và 06.
 #
 # Nội dung:
 # 1. Tổng quan: kích thước, kiểu dữ liệu, nhãn, giá trị thiếu, trùng lặp
@@ -97,13 +97,13 @@ print(f"AUC khi chỉ dùng id: {auc_id:.4f} (0,5 = không rò rỉ)")
 
 # %% [markdown]
 # **Nhận xét mục 1**
-# - Train 699.635 dòng, test 299.844 dòng, 21 feature: 4 category, 13 cột điểm thứ bậc 0–5, 4 cột số. Kiểu dữ liệu
-#   đã đúng, không cần ép kiểu.
-# - Nhãn: 44,36% hài lòng. Hơi lệch nhưng không mất cân bằng nặng, nên không cần over/under-sampling.
-#   StratifiedKFold giữ đúng tỉ lệ 44,36% ở cả 5 fold.
-# - Chỉ `Arrival Delay in Minutes` có giá trị thiếu: 292 dòng train (0,04%), 130 dòng test.
-# - Không có dòng trùng, kể cả trùng riêng 21 feature; không dòng test nào trùng một dòng train, nên không có lối
-#   tắt "tra cứu đáp án". `id` cho AUC 0,5001, tức không mang thông tin, loại khỏi feature.
+# - Train có 699.635 dòng, test 299.844 dòng, với 21 feature gồm 4 cột category, 13 cột điểm thứ bậc 0–5 và 4 cột
+#   số. Kiểu dữ liệu đã đúng, không cần ép kiểu.
+# - 44,36% hành khách hài lòng. Nhãn hơi lệch nhưng không mất cân bằng nặng, nên không cần over/under-sampling;
+#   StratifiedKFold giữ đúng tỉ lệ này ở cả 5 fold.
+# - Chỉ cột `Arrival Delay in Minutes` có giá trị thiếu, gồm 292 dòng train (0,04%) và 130 dòng test.
+# - Không có dòng trùng, kể cả khi chỉ xét 21 feature, và không dòng test nào trùng một dòng train. Cột `id` cho AUC
+#   0,5001, tức không mang thông tin, nên bị loại khỏi feature.
 
 # %% [markdown]
 # ## 2. Phân tích đơn biến
@@ -185,14 +185,14 @@ P.save(fig, "E1_03_numeric_distribution")
 
 # %% [markdown]
 # **Nhận xét mục 2**
-# - Category: `Gender` cân bằng; 82% là khách thân thiết; 71% đi công tác; `Class` gần như chỉ có Business (49%) và
-#   Eco (47%), Eco Plus hiếm (4,3%).
-# - Cột điểm: phần lớn điểm 3–5. Wifi, đặt vé online và vị trí cổng bị chấm thấp nhất. Điểm 0 ("không áp dụng")
-#   hiếm, nhiều nhất ở `Departure/Arrival time convenient` (3,7%), `Ease of Online booking` (2,3%), wifi (1,9%) và
-#   `Online boarding` (1,3%); `Baggage handling` không có điểm 0.
-# - `Age` 7–85, gần đối xứng (skew −0,05). `Flight Distance` lệch phải (skew 1,08), tập trung ở 500–1.000.
-# - Hai cột delay: 91% bằng 0, skew khoảng 13, đuôi dài tới 489 phút. Trên thang log1p vẫn lệch, nên mô hình nhạy
-#   với thang đo (LR, KNN) cần biến đổi log1p hoặc cắt ngưỡng.
+# - `Gender` cân bằng; 82% là khách thân thiết và 71% đi công tác. `Class` gần như chỉ có Business (49%) và Eco
+#   (47%), Eco Plus hiếm (4,3%).
+# - Ở các cột điểm, phần lớn giá trị là 3–5; wifi, đặt vé online và vị trí cổng bị chấm thấp nhất. Điểm 0 ("không áp
+#   dụng") hiếm, nhiều nhất ở `Departure/Arrival time convenient` (3,7%), `Ease of Online booking` (2,3%), wifi (1,9%)
+#   và `Online boarding` (1,3%); `Baggage handling` không có điểm 0.
+# - `Age` từ 7 đến 85, gần đối xứng (skew −0,05). `Flight Distance` lệch phải (skew 1,08), tập trung ở 500–1.000.
+# - Hai cột delay có 91% giá trị bằng 0, skew khoảng 13 và đuôi dài tới 489 phút. Sau log1p vẫn còn lệch, vì vậy các
+#   model nhạy với thang đo (LR, KNN) cần biến đổi log1p hoặc cắt ngưỡng.
 
 # %% [markdown]
 # ## 3. Ngoại lệ và giá trị thiếu
@@ -234,15 +234,15 @@ print("=> Có thể điền delay đến bằng delay đi (hoặc mô hình hồ
 
 # %% [markdown]
 # **Nhận xét mục 3**
-# - IQR **không dùng được** cho hai cột delay: Q1 = Q3 = 0 nên IQR = 0 và mọi delay khác 0 (9,2% / 8,4% số dòng) đều
-#   bị coi là ngoại lệ. Đó không phải lỗi dữ liệu mà là phân phối dồn về 0, nên không xoá dòng; xử lý bằng log1p,
-#   cắt ngưỡng hoặc cờ "có trễ" (so sánh ở E2). z-score (|z| > 3) chỉ bắt khoảng 2% nhưng cũng giả định phân phối
-#   chuẩn, vốn không đúng ở đây.
-# - `Age` không có ngoại lệ. `Flight Distance` có 3,3% vượt cận trên 3.588 theo IQR, nhưng đó là chuyến bay dài thật
-#   và có tỉ lệ hài lòng 81% (cao hơn hẳn mức chung 44%), tức mang thông tin, không nên xoá.
-# - Giá trị thiếu chỉ 0,04%. Tỉ lệ hài lòng ở các dòng thiếu là 36%, hơi thấp hơn mức chung, nhưng 292 dòng là quá ít
-#   để kết luận. Ở 86,9% dòng đủ dữ liệu, delay đến bằng đúng delay đi, nên điền delay đến bằng delay đi là hợp lý.
-#   E2 so sánh: điền median, điền bằng delay đi, thêm cờ thiếu.
+# - Không dùng được IQR cho hai cột delay. Vì Q1 = Q3 = 0 nên IQR = 0, và mọi delay khác 0 (9,2% và 8,4% số dòng)
+#   đều bị coi là ngoại lệ. Đây là do phân phối dồn về 0 chứ không phải lỗi dữ liệu, nên nhóm không xoá dòng mà xử lý
+#   bằng log1p, cắt ngưỡng hoặc cờ "có trễ" (so sánh ở E2). Cách z-score (|z| > 3) chỉ đánh dấu khoảng 2% số dòng,
+#   nhưng lại giả định phân phối chuẩn, điều không đúng ở đây.
+# - `Age` không có ngoại lệ. `Flight Distance` có 3,3% số dòng vượt cận trên 3.588 theo IQR, nhưng đó là các chuyến
+#   bay dài thật, với tỉ lệ hài lòng 81% (so với 44% chung). Các dòng này mang thông tin nên không xoá.
+# - Giá trị thiếu chỉ chiếm 0,04%. Tỉ lệ hài lòng ở các dòng thiếu là 36%, hơi thấp hơn mức chung, nhưng 292 dòng là
+#   quá ít để kết luận. Ở 86,9% số dòng đủ dữ liệu, delay đến bằng đúng delay đi, nên điền delay đến bằng delay đi là
+#   hợp lý. E2 so sánh cách này với điền median và thêm cờ thiếu.
 
 # %% [markdown]
 # ## 4. Phân tích hai biến: từng cột với nhãn
@@ -354,21 +354,20 @@ P.save(fig, "E1_07_univariate_auc")
 
 # %% [markdown]
 # **Nhận xét mục 4**
-# - Cột điểm: tỉ lệ hài lòng nhìn chung tăng theo điểm. Mạnh nhất là `Online boarding`: 11% ở điểm 1, 88% ở điểm 5.
-# - **Điểm 0 hành xử khác hẳn "điểm thấp nhất"**: wifi = 0 có 89% hài lòng (13 nghìn dòng), đặt vé online = 0 có
-#   71%, online boarding = 0 có 62%. Riêng wifi, điểm 0 (89%) cao hơn mọi mức 1–4 và chỉ đứng sau điểm 5 (95%).
-#   Vì vậy không nên coi 0 là số nhỏ nhất của thang đo; cần mã hoá riêng (one-hot hoặc cờ điểm 0) cho mô hình
-#   tuyến tính.
+# - Nhìn chung tỉ lệ hài lòng tăng theo điểm. Rõ nhất là `Online boarding`, từ 11% ở điểm 1 lên 88% ở điểm 5.
+# - **Điểm 0 không giống "điểm thấp nhất".** Khách chấm wifi = 0 có 89% hài lòng (13 nghìn dòng), đặt vé online = 0
+#   có 71%, online boarding = 0 có 62%. Riêng với wifi, điểm 0 (89%) cao hơn mọi mức 1–4 và chỉ sau điểm 5 (95%). Vì
+#   vậy không nên coi 0 là mức nhỏ nhất của thang đo; với model tuyến tính cần mã hoá riêng (one-hot hoặc cờ điểm 0).
 # - Chỉ 6/13 cột có tỉ lệ tăng đều từ điểm 1 đến 5; `Departure/Arrival time convenient` còn giảm nhẹ (51% → 44%).
-#   Quan hệ không đơn điệu này mô hình tuyến tính không học được nếu để điểm dạng số.
-# - `Age`: khách hài lòng tập trung ở 40–60 tuổi, khách không hài lòng nhiều ở dưới 30 và trên 60, quan hệ hình
-#   chữ ∩, không tuyến tính. `Flight Distance`: chuyến trên khoảng 1.500 có tỉ lệ hài lòng cao hơn.
-# - Delay: tỉ lệ hài lòng giảm từ 45% (không trễ) xuống khoảng 30% khi trễ trên 15 phút, nhưng 91% dòng không trễ nên
-#   AUC của cả cột chỉ 0,51.
-# - AUC một cột: mạnh nhất `Online boarding` 0,840, `Class` 0,782, `Inflight entertainment` 0,745, `Seat comfort`
-#   0,732, `Type of Travel` 0,703. Yếu nhất `Gender` 0,506, hai cột delay 0,509 / 0,516, `Gate location` 0,514,
-#   `Departure/Arrival time convenient` 0,527. Yếu khi đứng riêng chưa chắc vô dụng khi kết hợp, nên việc bỏ cột
-#   được quyết bằng CV ở E2 (chọn đặc trưng).
+#   Model tuyến tính không học được quan hệ không đơn điệu này nếu để điểm ở dạng số.
+# - Khách hài lòng tập trung ở 40–60 tuổi, khách không hài lòng nhiều ở nhóm dưới 30 và trên 60, nên quan hệ giữa
+#   `Age` và nhãn có dạng chữ ∩. Các chuyến dài hơn khoảng 1.500 có tỉ lệ hài lòng cao hơn.
+# - Tỉ lệ hài lòng giảm từ 45% khi không trễ xuống khoảng 30% khi trễ trên 15 phút. Tuy vậy 91% số dòng không trễ, nên
+#   AUC của cả cột delay chỉ 0,51.
+# - Xét AUC của từng cột đứng riêng, mạnh nhất là `Online boarding` 0,840, `Class` 0,782, `Inflight entertainment`
+#   0,745, `Seat comfort` 0,732 và `Type of Travel` 0,703. Yếu nhất là `Gender` 0,506, hai cột delay 0,509 và 0,516,
+#   `Gate location` 0,514, `Departure/Arrival time convenient` 0,527. Cột yếu khi đứng riêng chưa chắc vô dụng khi kết
+#   hợp, nên việc bỏ cột được quyết bằng CV ở E2 (feature selection).
 
 # %% [markdown]
 # ## 5. Tương quan và tương tác
@@ -423,15 +422,16 @@ P.save(fig, "E1_09_category_interaction")
 
 # %% [markdown]
 # **Nhận xét mục 5**
-# - Tương quan mạnh nhất: wifi và đặt vé online (0,77). Có hai cụm cột: "trải nghiệm trên máy bay" (ghế, vệ sinh,
-#   giải trí, đồ ăn; 0,62–0,73) và "đặt vé, sân bay" (wifi, đặt vé, vị trí cổng, giờ bay; 0,55–0,77). Không cặp nào
-#   vượt 0,8 nên không có cột trùng lặp hẳn, nhưng đa cộng tuyến ở mức vừa: mô hình tuyến tính nên có chính quy hoá
-#   (Ridge / L1, Bài 07).
-# - Hai cột delay tương quan Spearman 0,47: thấp vì phần lớn bằng 0 và các giá trị khác 0 lệch nhau nhiều.
-# - **Tương tác mạnh**: khách công tác ngồi Business hài lòng 73%, còn khách đi việc riêng chỉ khoảng 10% bất kể hạng
-#   ghế, tức `Class` chỉ có tác dụng với khách công tác. Tương tự, khách thân thiết đi công tác 71% so với đi việc
-#   riêng 10%. Ô "không thân thiết × đi việc riêng" chỉ có 105 dòng. Mô hình tuyến tính cần feature ghép
-#   (ví dụ `Type of Travel` × `Class`) để học được điều này; mô hình cây tự tách được (kiểm chứng ở E2, E3).
+# - Cặp tương quan mạnh nhất là wifi và đặt vé online (0,77). Các cột điểm chia thành hai cụm: "trải nghiệm trên máy
+#   bay" (ghế, vệ sinh, giải trí, đồ ăn; 0,62–0,73) và "đặt vé, sân bay" (wifi, đặt vé, vị trí cổng, giờ bay;
+#   0,55–0,77). Không cặp nào vượt 0,8 nên không có cột trùng lặp hẳn, nhưng đa cộng tuyến ở mức vừa, vì vậy model
+#   tuyến tính nên có regularization (Ridge hoặc L1, Bài 07).
+# - Hai cột delay chỉ tương quan Spearman 0,47, do phần lớn giá trị bằng 0 và các giá trị khác 0 lệch nhau nhiều.
+# - Có tương tác mạnh giữa các cột category. Khách công tác ngồi Business hài lòng 73%, còn khách đi việc riêng chỉ
+#   khoảng 10% bất kể hạng ghế; nói cách khác `Class` chỉ có tác dụng với khách công tác. Tương tự, khách thân thiết
+#   đi công tác hài lòng 71%, đi việc riêng 10%. Ô "không thân thiết × đi việc riêng" chỉ có 105 dòng. Model tuyến
+#   tính cần feature ghép (ví dụ `Type of Travel` × `Class`) mới học được tương tác này, còn model cây có thể tự tách
+#   (kiểm chứng ở E2).
 
 # %% [markdown]
 # ## 6. Phân tích đa biến không giám sát (Bài 06)
@@ -507,7 +507,7 @@ P.save(fig, "E1_11_tsne")
 
 # %% [markdown]
 # ### 6.3 Gom cụm KMeans trên 13 cột điểm
-# Gom hành khách theo "hồ sơ chấm điểm", xem tỉ lệ hài lòng từng cụm khác nhau đến đâu (gợi ý đặc trưng cụm ở E2).
+# Gom hành khách theo "hồ sơ chấm điểm", xem tỉ lệ hài lòng từng cụm khác nhau đến đâu (gợi ý feature cụm ở E2).
 
 # %%
 from sklearn.cluster import KMeans
@@ -528,17 +528,19 @@ clu.round(3)
 
 # %% [markdown]
 # **Nhận xét mục 6**
-# - PCA: PC1 giữ 20% phương sai, PC2 12%; cần 14/22 thành phần mới giữ 90%, tức dữ liệu không nén mạnh được, giảm
-#   chiều để huấn luyện không hứa hẹn. PC1 là trục "chất lượng trải nghiệm" (giải trí, ghế, vệ sinh, online boarding
-#   mang dấu dương; hạng Eco mang dấu âm). **Riêng PC1 đạt AUC 0,880**, cao hơn mọi cột đơn lẻ (cao nhất 0,840): tổng
-#   hợp nhiều cột điểm có ích, gợi ý feature tổng / trung bình điểm ở E2. PC2 chủ yếu là wifi.
-# - Trên mặt phẳng PC1–PC2, hai lớp tách dần theo PC1 nhưng chồng lấn nhiều ở giữa. Các "sọc" là do điểm là số rời rạc.
-# - t-SNE: nhiều cụm gần như chỉ một lớp, xen kẽ vài vùng trộn lẫn. Biên phân lớp phi tuyến và cục bộ, phù hợp với
-#   mô hình cây / boosting hơn mô hình tuyến tính (kiểm chứng ở E3).
-# - KMeans 6 cụm trên 13 cột điểm: tỉ lệ hài lòng từ 10% đến 85%, riêng mã cụm đã đạt AUC 0,854. Hai cụm đáng chú ý:
-#   cụm wifi thấp (1,9) nhưng online boarding, giải trí, ghế cao vẫn có 85% hài lòng; ngược lại cụm giải trí và ghế
-#   cao (4,4 / 4,3) nhưng online boarding thấp (2,0) chỉ có 10%. Online boarding quan trọng hơn tiện nghi trên máy
-#   bay. Inertia giảm đều theo k, không có "khuỷu tay" rõ, nên k = 6 là lựa chọn minh hoạ; đặc trưng cụm được thử ở E2.
+# - PC1 giữ 20% phương sai, PC2 12%; cần 14/22 thành phần mới giữ được 90%. Dữ liệu không nén mạnh được, nên giảm
+#   chiều trước khi huấn luyện không có nhiều lợi ích. PC1 là trục "chất lượng trải nghiệm": giải trí, ghế, vệ sinh,
+#   online boarding mang dấu dương, hạng Eco mang dấu âm. **Riêng PC1 đạt AUC 0,880**, cao hơn mọi cột đơn lẻ (cao
+#   nhất 0,840), cho thấy tổng hợp nhiều cột điểm có ích; E2 thử feature tổng và trung bình điểm. PC2 chủ yếu là wifi.
+# - Trên mặt phẳng PC1–PC2, hai lớp tách dần theo PC1 nhưng chồng lấn nhiều ở giữa. Các "sọc" xuất hiện vì điểm là số
+#   rời rạc.
+# - Trên t-SNE có nhiều cụm gần như chỉ chứa một lớp, xen với vài vùng trộn lẫn. Biên phân lớp có vẻ phi tuyến và cục
+#   bộ, gợi ý model cây hoặc boosting sẽ hợp hơn model tuyến tính (kiểm chứng ở E3).
+# - Với KMeans 6 cụm trên 13 cột điểm, tỉ lệ hài lòng giữa các cụm chênh từ 10% đến 85%, và riêng mã cụm đã đạt AUC
+#   0,854. Cụm có wifi thấp (1,9) nhưng online boarding, giải trí, ghế cao vẫn có 85% hài lòng; ngược lại cụm có giải
+#   trí và ghế cao (4,4 và 4,3) nhưng online boarding thấp (2,0) chỉ có 10%. Như vậy online boarding ảnh hưởng nhiều
+#   hơn tiện nghi trên máy bay. Inertia giảm đều theo k, không có "khuỷu tay" rõ, nên k = 6 chỉ là lựa chọn để minh
+#   hoạ; feature cụm được thử ở E2.
 
 # %% [markdown]
 # ## 7. Train và test có cùng phân phối không? (adversarial validation)
@@ -622,15 +624,15 @@ P.save(fig, "E1_12_original_vs_train")
 
 # %% [markdown]
 # **Nhận xét mục 7–8**
-# - Adversarial AUC = 0,4995 và KS giữa train và test ≤ 0,003 ở mọi cột: hai tập cùng phân phối, nên CV trên train
-#   phản ánh đúng test. Mọi chênh lệch giữa CV và leaderboard sau này là do nhiễu (public LB chỉ có 60 nghìn dòng),
-#   không do dịch chuyển dữ liệu (phân tích ở E6).
-# - Dữ liệu gốc (129.880 dòng) giống dữ liệu cuộc thi ở phần lớn cột: tỉ lệ hài lòng 43,5% so với 44,4%, các cột điểm
-#   có KS ≤ 0,07. Nhưng lệch mạnh ở: delay bằng 0 (56% ở gốc so với 91%), delay q99 (180 so với 30 phút),
-#   `Flight Distance` (trung vị 844 so với 954, KS 0,22), Eco Plus (7,3% so với 4,3%). Chỉ 17 dòng train trùng hệt
-#   một dòng gốc, tức bộ sinh dữ liệu không chép dòng.
-# - Hệ quả: ghép dữ liệu gốc vào huấn luyện phải lưu ý cột delay, chỉ thêm vào phần train của fold (không bao giờ vào
-#   fold validation), và giữ lại hay không phải quyết bằng CV (E2).
+# - Adversarial AUC bằng 0,4995 và thống kê KS giữa train và test không quá 0,003 ở mọi cột. Hai tập có cùng phân
+#   phối, nên CV trên train phản ánh được test. Chênh lệch giữa CV và leaderboard về sau có thể quy cho nhiễu (public
+#   LB chỉ có 60 nghìn dòng) chứ không phải do dữ liệu dịch chuyển (phân tích ở E6).
+# - Dữ liệu gốc (129.880 dòng) giống dữ liệu cuộc thi ở phần lớn cột, với tỉ lệ hài lòng 43,5% so với 44,4% và KS của
+#   các cột điểm không quá 0,07. Khác biệt lớn nằm ở tỉ lệ delay bằng 0 (56% ở dữ liệu gốc so với 91%), phân vị 99 của
+#   delay (180 so với 30 phút), `Flight Distance` (trung vị 844 so với 954, KS 0,22) và tỉ lệ Eco Plus (7,3% so với
+#   4,3%). Chỉ 17 dòng train trùng hệt một dòng gốc, tức bộ sinh dữ liệu không sao chép dòng.
+# - Vì vậy nếu ghép dữ liệu gốc vào huấn luyện thì phải lưu ý cột delay, chỉ thêm vào phần train của fold (không bao
+#   giờ vào fold validation), và quyết định giữ hay bỏ bằng CV (E2).
 
 # %% [markdown]
 # ## 9. Tóm tắt và hàm ý cho tiền xử lý (E2)
@@ -641,10 +643,10 @@ P.save(fig, "E1_12_original_vs_train")
 # | `Arrival Delay` thiếu 0,04%; 87% dòng có delay đến = delay đi | điền bằng delay đi / median / thêm cờ thiếu | E2: giá trị thiếu |
 # | Delay dồn về 0 (91%), đuôi dài; IQR không dùng được | log1p, cắt ngưỡng, cờ "có trễ"; không xoá dòng | E2: ngoại lệ, biến đổi |
 # | Điểm 0 = "không áp dụng", tỉ lệ hài lòng rất khác | one-hot điểm hoặc cờ điểm 0 | E2: mã hoá |
-# | Quan hệ không đơn điệu (`Age`, 7/13 cột điểm) | rời rạc hoá / one-hot cho mô hình tuyến tính | E2: biến đổi; E3 |
+# | Quan hệ không đơn điệu (`Age`, 7/13 cột điểm) | rời rạc hoá / one-hot cho model tuyến tính | E2: biến đổi; E3 |
 # | Tương tác `Type of Travel` × `Class`, `Customer Type` × `Type of Travel` | feature ghép | E2: tạo feature |
-# | PC1 (AUC 0,880) và cụm KMeans (0,854) mạnh hơn mọi cột đơn | tổng / trung bình điểm, đặc trưng cụm, PCA | E2: tạo feature |
-# | Đa cộng tuyến mức vừa giữa các cột điểm | chính quy hoá cho LR | E3, E4 |
+# | PC1 (AUC 0,880) và cụm KMeans (0,854) mạnh hơn mọi cột đơn | tổng / trung bình điểm, feature cụm, PCA | E2: tạo feature |
+# | Đa cộng tuyến mức vừa giữa các cột điểm | regularization cho LR | E3, E4 |
 # | Vài cột rất yếu khi đứng riêng | chọn feature bằng CV, không bỏ theo cảm tính | E2: chọn feature |
 # | Train và test cùng phân phối | tin CV | E0, E6 |
 # | Dữ liệu gốc lệch ở delay và `Flight Distance` | ghép thận trọng, chỉ vào phần train của fold | E2 |

@@ -14,11 +14,11 @@ Phần **tái lập thật** nằm ở:
 | Tái lập | Ở đâu | Kết quả |
 | --- | --- | --- |
 | File nộp slot 1 (private 0,96239) từ các phần đã lưu | `reproduce_final.py` | trùng từng byte với file đã nộp (cùng md5) |
-| Model `A_lr` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/E2_preprocess.py`) | 0,959727 (chênh 1e-5) |
-| Model `A_lgb` (CV khi thi 0,960893) | E2, bậc "4t, lr 0,02" (`exp/kaggle/E2_lgb.py`) | 0,960889 (chênh 4e-6) |
+| Model `A_lr` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/E2_preprocess.py`) | 0,959727 (chênh 1×10⁻⁵) |
+| Model `A_lgb` (CV khi thi 0,960893) | E2, bậc "4t, lr 0,02" (`exp/kaggle/E2_lgb.py`) | 0,960889 (chênh 4×10⁻⁶) |
 
-Chênh lệch khi tái lập đến từ số luồng (LightGBM không cho kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn,
-nhỏ hơn nhiễu giữa hai seed (Q-FT: 2,4e-5). *Ghi chú:* số "khi thi" là bản `_v2` (18/10), sau khi sửa một lỗi đảo cột
+Chênh lệch khi tái lập có thể đến từ số luồng (LightGBM không cho kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn,
+nhỏ hơn nhiễu giữa hai seed (với Q-FT là 2,4×10⁻⁵). *Ghi chú:* số "khi thi" là bản `_v2` (18/10), sau khi sửa một lỗi đảo cột
 Flight Distance / Age ở bản đầu; `src/features.py` là bản đã sửa.
 
 ## Danh sách script

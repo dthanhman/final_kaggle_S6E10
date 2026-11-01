@@ -1,23 +1,23 @@
 # %% [markdown]
 # # E0. Thiết lập đánh giá
 #
-# Trước khi so sánh bất kỳ mô hình hay cách tiền xử lý nào, cần thống nhất **đo bằng gì** và **đo thế nào**
-# (Bài 05: Đánh giá mô hình). Notebook này trả lời ba câu hỏi:
+# Trước khi so sánh model hay cách tiền xử lý, nhóm cần thống nhất đo bằng độ đo nào và đo theo quy trình nào
+# (Bài 05, Đánh giá mô hình). Phần này xét ba vấn đề:
 #
-# 1. **Độ đo**: vì sao dùng ROC AUC thay vì accuracy / F1?
-# 2. **Quy trình đánh giá**: vì sao dùng K-fold CV (5 fold cố định trong `data/folds.csv`) thay vì đánh giá trên tập
-#    train hay một lần tách train/test?
-# 3. **Rò rỉ dữ liệu (leakage)**: thế nào là dự đoán out-of-fold (OOF) "sạch", và OOF "bẩn" làm điểm CV sai lệch
-#    bao nhiêu?
+# 1. Độ đo: vì sao dùng ROC AUC thay vì accuracy hay F1.
+# 2. Quy trình đánh giá: vì sao dùng K-fold CV với 5 fold cố định trong `data/folds.csv`, thay vì chấm trên tập train
+#    hay tách train/test một lần.
+# 3. Rò rỉ dữ liệu (data leakage): thế nào là dự đoán out-of-fold (OOF) "sạch", và OOF "bẩn" làm điểm CV lệch bao
+#    nhiêu.
 #
-# Mô hình dùng ở đây chỉ là công cụ minh hoạ (Logistic Regression, Decision Tree, LightGBM với cấu hình đơn giản);
-# so sánh mô hình nằm ở E3.
+# Các model ở đây (Logistic Regression, Decision Tree, LightGBM cấu hình đơn giản) chỉ dùng để minh hoạ; phần so
+# sánh model nằm ở E3.
 #
-# > **Trong cuộc thi.** `data/folds.csv` được tạo ngày 12/10 (`src/make_folds.py`) và dùng cho mọi model, mọi stack.
-# > Quy tắc OOF sạch áp dụng từ model đầu tiên (14/10, `A_lgb`): early stopping trên 10% tách từ phần train của
-# > fold, target encoding tính trong fold. Khi chuyển sang stacking, ngưỡng giữ một thay đổi được siết dần: +3e-5 ổn
-# > định qua 3 meta seed (18/10), rồi tăng ở cả 3 seed, ≥ 10/15 fold và ≥ +5e-6 (20/10). Notebook này dựng lại các
-# > quy tắc đó và đo bằng số vì sao chúng cần thiết.
+# > **Trong cuộc thi.** `data/folds.csv` được tạo ngày 12/10 (`src/make_folds.py`) và dùng cho mọi model, mọi bản
+# > stacking. Quy tắc OOF sạch được áp dụng từ model đầu tiên (`A_lgb`, 14/10): early stopping dùng 10% tách từ phần
+# > train của fold, target encoding tính trong fold. Khi chuyển sang stacking, nhóm siết dần ngưỡng giữ một thay
+# > đổi. Ngày 18/10 ngưỡng là tăng 3×10⁻⁵ và ổn định qua 3 meta seed; từ 20/10 là tăng ở cả 3 seed, ít nhất 10/15
+# > fold và ít nhất 5×10⁻⁶ (gọi tắt là "cổng"). Các mục dưới đây đo lại bằng thí nghiệm lý do của từng quy tắc.
 
 # %%
 import sys
@@ -54,9 +54,9 @@ N_JOBS = 6  # giới hạn số luồng để máy không quá tải
 # %% [markdown]
 # ## 1. Độ đo
 # ### 1.1 Mô hình baseline
-# Logistic Regression với tiền xử lý tối thiểu: điền `Arrival Delay` bằng `Departure Delay`, log1p hai cột delay,
-# chuẩn hoá z-score cột số và cột điểm, one-hot cột category. Toàn bộ pipeline nằm trong `fit_predict` nên chỉ học
-# từ phần train của mỗi fold.
+# Logistic Regression với tiền xử lý tối thiểu. `Arrival Delay` thiếu được điền bằng `Departure Delay`, hai cột delay
+# lấy log1p, cột số và cột điểm chuẩn hoá z-score, cột category mã hoá one-hot. Toàn bộ pipeline đặt trong
+# `fit_predict`, vì vậy chỉ học từ phần train của mỗi fold.
 
 # %%
 def basic_frame(X):
@@ -85,9 +85,9 @@ oof = base["oof"]
 
 # %% [markdown]
 # ### 1.2 AUC chỉ phụ thuộc thứ tự
-# Biến đổi xác suất dự đoán bằng một hàm đồng biến (luỹ thừa, thứ hạng, kéo giãn logit): AUC giữ nguyên, còn
-# accuracy và F1 ở ngưỡng 0,5 và log loss đều thay đổi. Bài toán chấm bằng AUC nên chỉ cần **xếp hạng** hành khách
-# đúng, không cần chỉnh ngưỡng hay hiệu chỉnh xác suất.
+# Nếu biến đổi xác suất dự đoán bằng một hàm đồng biến (luỹ thừa, thứ hạng, kéo giãn logit) thì AUC giữ nguyên, còn
+# accuracy, F1 ở ngưỡng 0,5 và log loss đều thay đổi. Cuộc thi chấm bằng AUC, nên model chỉ cần xếp hạng hành khách
+# đúng thứ tự; không cần chọn ngưỡng hay hiệu chỉnh xác suất.
 
 # %%
 logit = np.log(oof / (1 - oof))
@@ -107,8 +107,8 @@ inv.round(5)
 
 # %% [markdown]
 # ### 1.3 Accuracy / F1 phụ thuộc ngưỡng, AUC thì không
-# Nhãn khá cân bằng (44% hài lòng) nên accuracy không quá sai lệch, nhưng vẫn phải chọn ngưỡng. ROC và AUC tổng hợp
-# mọi ngưỡng cùng lúc.
+# Nhãn khá cân bằng (44% hài lòng) nên accuracy không quá lệch, nhưng vẫn phải chọn một ngưỡng. Đường ROC và AUC
+# xét mọi ngưỡng cùng lúc.
 
 # %%
 th = np.linspace(0.02, 0.98, 97)
@@ -137,20 +137,21 @@ P.save(fig, "E0_01_threshold_roc")
 
 # %% [markdown]
 # **Nhận xét mục 1**
-# - LR baseline đạt CV AUC 0,92172; 5 fold nằm trong 0,9215–0,9226 (độ lệch chuẩn 0,0004). Đây là mốc so sánh cho
-#   E2 và E3.
-# - Bốn cách biến đổi đồng biến cho **AUC giống hệt** (0,92172), trong khi accuracy ở ngưỡng 0,5 giảm từ 0,878 xuống
-#   0,846, F1 từ 0,861 xuống 0,801, log loss tăng từ 0,344 lên 0,613. AUC chỉ đo khả năng xếp hạng.
-# - Accuracy cao nhất khoảng 0,88 ở ngưỡng 0,55; F1 lại tốt nhất ở ngưỡng khác. Dùng accuracy hay F1 thì phải chọn
-#   ngưỡng, thêm một chỗ có thể overfit. Đường ROC tổng hợp mọi ngưỡng cùng lúc.
-# - **Quyết định:** đánh giá bằng AUC trên OOF, đúng độ đo của cuộc thi; nộp xác suất, không chỉnh ngưỡng; khi kết hợp
-#   nhiều mô hình có thể trộn trên thứ hạng hoặc logit mà không làm hỏng độ đo (E5).
+# - LR baseline đạt CV AUC 0,92172, các fold nằm trong khoảng 0,9215–0,9226 (độ lệch chuẩn 0,0004). Đây là mốc so
+#   sánh cho E2 và E3.
+# - Bốn phép biến đổi đồng biến cho AUC giống hệt nhau (0,92172). Trong khi đó accuracy ở ngưỡng 0,5 giảm từ 0,878
+#   xuống 0,846, F1 giảm từ 0,861 xuống 0,801 và log loss tăng từ 0,344 lên 0,613. Như vậy AUC chỉ phụ thuộc vào thứ
+#   tự xếp hạng.
+# - Accuracy cao nhất khoảng 0,88 ở ngưỡng 0,55, còn F1 đạt cao nhất ở một ngưỡng khác. Dùng accuracy hay F1 thì phải
+#   chọn thêm ngưỡng, và ngưỡng chọn trên dữ liệu đánh giá cũng có thể bị overfit.
+# - Quyết định: đánh giá bằng AUC trên OOF, đúng độ đo của cuộc thi; nộp xác suất, không chỉnh ngưỡng. Khi kết hợp
+#   nhiều model, có thể trộn theo thứ hạng hoặc logit mà không ảnh hưởng tới độ đo (E5).
 
 # %% [markdown]
 # ## 2. Ba quy trình đánh giá (Bài 05)
 # ### 2.1 Quy trình 1: đánh giá ngay trên tập train
-# So AUC trên chính dữ liệu đã học với AUC 5-fold CV. Cây quyết định không giới hạn độ sâu nhớ thuộc lòng dữ liệu
-# nên AUC trên train gần 1, nhưng CV thấp hơn hẳn (overfitting). LR đơn giản gần như không chênh.
+# So sánh AUC trên chính dữ liệu đã dùng để học với AUC 5-fold CV, cho ba model: LR, cây quyết định độ sâu 10 và cây
+# không giới hạn độ sâu.
 
 # %%
 def tree_frame(X):
@@ -180,11 +181,10 @@ qt1.round(4)
 
 # %% [markdown]
 # ### 2.2 Quy trình 2 (một lần tách train/test) và quy trình 3 (K-fold)
-# Lặp 10 lần tách ngẫu nhiên 80/20 với 10 seed khác nhau (QT2), so với 5 fold cố định (QT3). Mỗi lần tách cho một
-# con số khác nhau; trung bình 5 fold ổn định hơn và mọi dòng train đều được dự đoán đúng một lần (OOF), dùng được
-# cho ensemble ở E5.
+# Tách ngẫu nhiên 80/20 mười lần với 10 seed khác nhau (quy trình 2), so với 5 fold cố định (quy trình 3). Ngoài độ
+# ổn định, K-fold còn cho mỗi dòng train đúng một dự đoán OOF, là đầu vào cho ensemble ở E5.
 #
-# *Các lần tách ngẫu nhiên ở đây chỉ để minh hoạ độ dao động của quy trình; mọi so sánh mô hình trong đồ án đều dùng
+# *Các lần tách ngẫu nhiên ở đây chỉ để đo độ dao động của quy trình; mọi so sánh model trong đồ án đều dùng
 # `folds.csv`.*
 
 # %%
@@ -219,28 +219,28 @@ P.save(fig, "E0_02_holdout_vs_kfold")
 
 # %% [markdown]
 # **Nhận xét mục 2**
-# - **Quy trình 1 sai lệch nặng với mô hình phức tạp.** LR cho AUC trên train bằng CV (0,9217): mô hình đơn giản,
-#   bias cao, không overfit. Cây độ sâu 10 chênh 0,003. Cây không giới hạn đạt 1,0000 trên train nhưng chỉ 0,8641 trên
-#   CV, chênh 0,136: nó thuộc lòng dữ liệu (overfitting, Bài 07).
-# - **Một lần holdout dao động nhiều.** 10 lần tách 80/20 cho AUC từ 0,9203 đến 0,9225 (biên độ 0,0022, độ lệch chuẩn
-#   0,0007). Trung bình 5 fold có độ lệch chuẩn ước lượng khoảng 0,0002, nhỏ hơn khoảng 3 lần. Hai mô hình chênh nhau
-#   0,0005 có thể đảo thứ tự chỉ vì cách chia nếu đánh giá bằng một lần holdout.
-# - So sánh hai mô hình trên **cùng** 5 fold (theo cặp) còn ổn định hơn so sánh hai con số trung bình, vì độ khó
-#   riêng của từng fold bị triệt tiêu. Vì vậy mọi bảng kết quả đều kèm chênh lệch từng fold và số fold tăng.
-# - K-fold còn cho dự đoán OOF trên toàn bộ 700 nghìn dòng train, nguyên liệu cho stacking ở E5.
+# - Chấm trên tập train (quy trình 1) sai lệch nặng với model phức tạp. Với LR, AUC trên train bằng CV (0,9217) vì
+#   model đơn giản, bias cao và không overfit. Cây độ sâu 10 chênh 0,003. Cây không giới hạn đạt 1,0000 trên train
+#   nhưng chỉ 0,8641 trên CV, chênh 0,136, tức là cây đã học thuộc dữ liệu train (overfitting, Bài 07).
+# - Một lần holdout dao động nhiều. Mười lần tách 80/20 cho AUC từ 0,9203 đến 0,9225 (biên độ 0,0022, độ lệch chuẩn
+#   0,0007). Độ lệch chuẩn ước lượng của trung bình 5 fold khoảng 0,0002, nhỏ hơn khoảng 3 lần. Nếu chỉ dùng một lần
+#   holdout, hai model chênh nhau 0,0005 vẫn có thể đảo thứ tự chỉ vì cách chia.
+# - So sánh hai model theo cặp trên cùng 5 fold còn ổn định hơn so sánh hai giá trị trung bình, do phần chênh lệch về
+#   độ khó giữa các fold bị loại bỏ. Vì vậy các bảng kết quả trong đồ án đều kèm chênh lệch từng fold và số fold tăng.
+# - K-fold cho dự đoán OOF trên toàn bộ 700 nghìn dòng train; đây là đầu vào cho stacking ở E5.
 
 # %% [markdown]
 # ## 3. OOF sạch và OOF bẩn: rò rỉ dữ liệu làm CV "đẹp giả"
-# Để thấy CV bị sai lệch bao nhiêu, cần một tập **chưa từng đụng tới**. Ta dùng fold 0–3 làm tập phát triển (dev,
-# chạy CV 4 fold như bình thường) và giữ **fold 4 làm test giả**. Mô hình sạch thì CV trên dev xấp xỉ điểm trên
-# fold 4; mô hình bẩn thì CV cao hơn hẳn điểm thật.
+# Muốn biết CV lệch bao nhiêu thì cần một tập chưa từng được dùng. Nhóm lấy fold 0–3 làm tập phát triển (dev, chạy CV
+# 4 fold như bình thường) và giữ fold 4 làm tập test giả. Với model sạch, CV trên dev xấp xỉ điểm trên fold 4; với
+# model bẩn, CV cao hơn điểm thật.
 #
-# Mô hình: LightGBM (category để dạng `category`). Xét hai kiểu rò rỉ hay gặp:
-# - **(a) Target encoding tính ngoài fold.** Mã hoá "hồ sơ 13 điểm dịch vụ" (rất nhiều giá trị khác nhau) bằng tỉ lệ
-#   hài lòng trung bình của hồ sơ đó. Bản bẩn tính tỉ lệ trên toàn bộ dev một lần, gồm cả nhãn của fold đang chấm
-#   và nhãn của chính dòng đó. Bản sạch tính trong từng fold, dòng train dùng giá trị out-of-fold lồng trong.
-# - **(b) Early stopping trên fold đang chấm.** Bản bẩn dừng sớm theo chính fold validation (chọn số cây tốt nhất cho
-#   fold đó). Bản sạch tách 10% từ phần train của fold để dừng sớm.
+# Model là LightGBM (cột category để kiểu `category`). Xét hai kiểu rò rỉ thường gặp:
+# - (a) Target encoding tính ngoài fold. Cột "hồ sơ 13 điểm dịch vụ" (rất nhiều giá trị khác nhau) được mã hoá bằng tỉ
+#   lệ hài lòng trung bình của hồ sơ đó. Bản bẩn tính tỉ lệ một lần trên toàn bộ dev, gồm cả nhãn của fold đang chấm
+#   và nhãn của chính dòng đó. Bản sạch tính trong từng fold; dòng train dùng giá trị out-of-fold của các fold con.
+# - (b) Early stopping trên fold đang chấm. Bản bẩn dừng sớm theo chính fold validation, tức chọn số cây tốt nhất cho
+#   fold đó. Bản sạch tách 10% từ phần train của fold để dừng sớm.
 
 # %%
 dev_mask = train["fold"].values != 4
@@ -374,25 +374,26 @@ P.save(fig, "E0_03_leakage")
 
 # %% [markdown]
 # **Nhận xét mục 3**
-# - **TE bẩn: CV 0,9935 nhưng điểm thật 0,9082**, CV báo cao hơn 0,085, và điểm thật còn thấp hơn hẳn mô hình không
-#   dùng TE (0,9590). Dev có 285.650 hồ sơ điểm khác nhau trên 560 nghìn dòng; phần lớn hồ sơ chỉ có 1–2 dòng, nên
-#   TE tính cả nhãn của chính dòng đó gần như **chép lại nhãn**. Mô hình học cách đọc nhãn thay vì học quy luật.
-# - **TE sạch**: CV 0,9578, thật 0,9588, khớp với không dùng TE. Feature này thật ra không giúp gì: tính sạch thì
-#   thấy ngay, tính bẩn thì tưởng là đột phá.
-# - **Early stopping bẩn** làm CV tăng 0,0002 (0,95831 so với 0,95812) nhưng điểm thật trên fold 4 không đổi
-#   (0,95903 so với 0,95905). Sai lệch nhỏ, nhưng cùng cỡ với chênh lệch giữa các phương án ở giai đoạn stacking
-#   (vài phần triệu đến vài phần vạn), đủ để chọn sai phương án.
-# - Ở mọi biến thể sạch, AUC trên fold 4 cao hơn CV khoảng 0,001: fold 4 hơi "dễ" hơn trung bình. Vì vậy cần so các
-#   biến thể với nhau, không so CV với một con số đơn lẻ.
+# - Target encoding (TE) bẩn cho **CV 0,9935 nhưng điểm thật chỉ 0,9082**. CV báo cao hơn 0,085, và điểm thật còn thấp
+#   hơn model không dùng TE (0,9590). Tập dev có 285.650 hồ sơ điểm khác nhau trên 560 nghìn dòng, phần lớn hồ sơ chỉ
+#   có 1–2 dòng. Vì vậy khi tính cả nhãn của chính dòng đó, giá trị TE gần như là nhãn, và model học cách đọc lại nhãn
+#   thay vì học quy luật.
+# - TE sạch cho CV 0,9578 và điểm thật 0,9588, ngang với không dùng TE. Feature này thực chất không giúp gì; chỉ khi
+#   tính sai cách nó mới trông như một cải thiện lớn.
+# - Early stopping bẩn làm CV tăng 2×10⁻⁴ (0,95831 so với 0,95812) nhưng điểm thật trên fold 4 không đổi (0,95903 so
+#   với 0,95905). Mức lệch này nhỏ, nhưng cùng cỡ với chênh lệch giữa các phương án ở giai đoạn stacking (10⁻⁶ đến
+#   10⁻⁴), nên đủ để chọn sai phương án.
+# - Ở mọi biến thể sạch, AUC trên fold 4 cao hơn CV khoảng 0,001, nghĩa là fold 4 dễ hơn mức trung bình. Do đó nên so
+#   các biến thể với nhau trên cùng fold, không so CV với một con số đơn lẻ.
 
 # %% [markdown]
 # ## 4. Quy ước đánh giá cho toàn bộ đồ án
-# 1. Một bộ fold duy nhất `data/folds.csv` (StratifiedKFold 5 fold, seed 42) cho mọi thí nghiệm và mọi mô hình.
+# 1. Một bộ fold duy nhất `data/folds.csv` (StratifiedKFold 5 fold, seed 42) cho mọi thí nghiệm và mọi model.
 # 2. Độ đo: AUC trên dự đoán OOF. Mỗi kết quả báo cáo CV AUC trên toàn bộ OOF, trung bình ± độ lệch chuẩn 5 fold,
 #    chênh lệch so với baseline và số fold tăng (`src/cv.py`).
 # 3. Mọi bước học từ dữ liệu (điền thiếu, chuẩn hoá, target encoding, chọn feature, gom cụm, PCA) chỉ fit trên phần
 #    train của fold; `run_cv` bắt buộc điều này qua hàm `fit_predict`.
 # 4. Early stopping dùng 10% tách từ phần train của fold, hoặc cố định số vòng lặp.
-# 5. Chỉ giữ một thay đổi khi nó tăng ở phần lớn fold (và qua nhiều seed với thay đổi nhỏ). Chênh lệch nhỏ hơn độ dao
-#    động giữa các lần chia thì coi như bằng nhau.
+# 5. Chỉ giữ một thay đổi khi nó tăng ở phần lớn fold (với thay đổi nhỏ thì phải tăng qua nhiều seed). Chênh lệch nhỏ
+#    hơn độ dao động giữa các cách chia được coi là bằng nhau.
 # 6. Public leaderboard (60 nghìn dòng) chỉ để tham khảo; đối chiếu CV, public và private ở E6.
