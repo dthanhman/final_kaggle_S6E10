@@ -74,7 +74,7 @@ def load():
 
 
 def params(lr):
-    # đúng tham số của model thi A_lgb_v2 (A_lgb_fe.py), trừ learning rate
+    # đúng tham số của model thi A_lgb (A_lgb_fe.py), trừ learning rate
     return dict(objective="binary", metric="auc", learning_rate=lr, num_leaves=63, max_depth=8,
                 min_child_samples=5, lambda_l2=5.0, lambda_l1=0.05, bagging_fraction=0.9, bagging_freq=1,
                 feature_fraction=0.9, seed=42, num_threads=N_JOBS, verbose=-1)
@@ -172,10 +172,10 @@ if __name__ == "__main__":
             np.save(WORK / "oof_E2_lgb_raw.npy", res["oof"])
             np.save(WORK / "test_E2_lgb_raw.npy", res["test"])
 
-    # 2. Bậc cuối với lr 0,02 = công thức model thi A_lgb_v2 (CV khi thi 0,960893; v1 0,960956 có lỗi đảo cột FD/Age)
+    # 2. Bậc cuối với lr 0,02 = công thức model thi A_lgb (CV khi thi 0,960893)
     X, X_test, K, K_test = build_static(train, test, orig, step=4, teachers=True, n_jobs=N_JOBS)
     res = run(X, X_test, K, K_test, y, fold, lr=0.02)
-    record("final", "4t, lr 0,02 (= A_lgb_v2)", res, base=ladder["4t"], notes="so với 4t lr 0,05; khi thi 0,960893")
+    record("final", "4t, lr 0,02 (= A_lgb khi thi)", res, base=ladder["4t"], notes="so với 4t lr 0,05; khi thi 0,960893")
     np.save(WORK / "oof_E2_lgb_final.npy", res["oof"])
     np.save(WORK / "test_E2_lgb_final.npy", res["test"])
     del X, X_test, K, K_test

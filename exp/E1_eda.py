@@ -7,7 +7,7 @@
 #
 # > **Trong cuộc thi.** EDA đầu tiên làm ngày 12–13/10 (mục 1, 2, 4, 5, 7); so sánh dữ liệu gốc và dữ liệu cuộc thi
 # > làm ngày 15/10 (mục 8). Các phát hiện về điểm 0, delay và tương tác `Type of Travel` × `Class` được dùng khi xây
-# > bộ feature của model đầu tiên (`A_lgb_v1`, 14/10). Bản này bổ sung phát hiện ngoại lệ (IQR, z-score), phân tích giá
+# > bộ feature của model đầu tiên (`A_lgb`, 14/10). Bản này bổ sung phát hiện ngoại lệ (IQR, z-score), phân tích giá
 # > trị thiếu và phân tích đa biến không giám sát (PCA, t-SNE, KMeans) theo Bài 03, 04, 06.
 #
 # Nội dung:

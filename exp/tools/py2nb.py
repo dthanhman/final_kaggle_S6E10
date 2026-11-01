@@ -51,6 +51,8 @@ def main():
     ap.add_argument("script")
     ap.add_argument("--no-run", action="store_true")
     ap.add_argument("--timeout", type=int, default=3600, help="giây tối đa cho mỗi ô")
+    ap.add_argument("--keep-outputs", action="store_true",
+                    help="chỉ sửa chữ (markdown): giữ output của notebook cũ, báo lỗi nếu có ô code đã đổi")
     args = ap.parse_args()
 
     src = Path(args.script).resolve()
@@ -58,6 +60,18 @@ def main():
     nb.cells = parse(src.read_text(encoding="utf-8"))
     nb.metadata["kernelspec"] = {"name": "python3", "display_name": "Python 3", "language": "python"}
     out = src.with_suffix(".ipynb")
+
+    if args.keep_outputs:
+        old = [c for c in nbformat.read(out, as_version=4).cells if c.cell_type == "code"]
+        new = [c for c in nb.cells if c.cell_type == "code"]
+        changed = [i for i, (a, b) in enumerate(zip(old, new)) if a.source != b.source]
+        if len(old) != len(new) or changed:
+            sys.exit(f"Ô code đã đổi (vị trí {changed or 'số ô khác'}), phải chạy lại notebook thay vì --keep-outputs")
+        for a, b in zip(old, new):
+            b.outputs, b.execution_count = a.outputs, a.execution_count
+        nbformat.write(nb, out)
+        print(f"Đã cập nhật markdown, giữ nguyên output: {out}")
+        return
 
     if not args.no_run:
         t0 = time.time()

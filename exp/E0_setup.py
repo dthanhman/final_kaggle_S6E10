@@ -14,7 +14,7 @@
 # so sánh mô hình nằm ở E3.
 #
 # > **Trong cuộc thi.** `data/folds.csv` được tạo ngày 12/10 (`src/make_folds.py`) và dùng cho mọi model, mọi stack.
-# > Quy tắc OOF sạch áp dụng từ model đầu tiên (14/10, `A_lgb_v1`): early stopping trên 10% tách từ phần train của
+# > Quy tắc OOF sạch áp dụng từ model đầu tiên (14/10, `A_lgb`): early stopping trên 10% tách từ phần train của
 # > fold, target encoding tính trong fold. Khi chuyển sang stacking, ngưỡng giữ một thay đổi được siết dần: +3e-5 ổn
 # > định qua 3 meta seed (18/10), rồi tăng ở cả 3 seed, ≥ 10/15 fold và ≥ +5e-6 (20/10). Notebook này dựng lại các
 # > quy tắc đó và đo bằng số vì sao chúng cần thiết.

@@ -1,0 +1,8 @@
+bước,Δ CV với LR,Δ CV với LightGBM
+Điền thiếu bằng median (thay vì để trống / điền delay đi),1.0000000000287557e-06,-1.4999999999987246e-05
+Thêm cờ thiếu,0.0,-4.599999999999049e-05
+log1p hai cột delay (so với để nguyên phút),0.00017199999999994997,-1.3000000000040757e-05
+Cắt delay ở phân vị 99,4.000000000004e-06,-5.000000000032756e-06
+Chuẩn hoá z-score (so với không chuẩn hoá),0.0,4.999999999921734e-06
+Điểm 0–5 thành biến phân loại (one-hot / category),0.026966000000000045,-4.4000000000044004e-05
+Category one-hot (so với mã số / native),,-8.000000000008e-06

@@ -6,7 +6,7 @@ như vậy:
 
 | Vòng | Thời gian | Nội dung | Kết quả | Đạt top 5%? |
 | --- | --- | --- | --- | --- |
-| 1 | 12–14/10 | EDA, tạo feature, LightGBM đơn | CV 0,96096, public 0,96061 | chưa (ngưỡng ≈ 0,9619) |
+| 1 | 12–14/10 | EDA, tạo feature, LightGBM đơn | CV 0,9609, public 0,96061 | chưa (ngưỡng ≈ 0,9619) |
 | 2 | 15–19/10 | mô hình khác loại (LR, KNN, TabM, FM, FT-Transformer, TabPFN, mô hình ngôn ngữ) | stack chỉ gồm model nhóm tự train: 0,96121 (10 model, 19/10); đủ 25 model của cả 3 thành viên, gồm Q-FT: 0,96162 | chưa |
 | 3 | 15–25/10 | stacking với bộ OOF công khai, Q-FT tự viết | CV 0,962224 | gần |
 | 4 | 25–31/10 | chọn 2 bài nộp, đối chiếu public / private | private 0,96239, hạng 66 / ~3748 | đạt |
@@ -31,7 +31,7 @@ rò rỉ dữ liệu, overfit public LB...). Mục cuối E6 tổng hợp bài h
 | --- | --- | --- | --- | --- | --- |
 | E0 | Thiết lập đánh giá | 05 | `folds.csv` 12/10, luật OOF sạch 14/10, ngưỡng giữ thay đổi 18–20/10 | độ đo AUC; 3 quy trình đánh giá; đo rò rỉ (TE, early stopping) | xong |
 | E1 | Kiểm tra dữ liệu (EDA) | 03, 06 | EDA 12–13/10, so sánh dữ liệu gốc 15/10 | thêm IQR / z-score, giá trị thiếu, PCA, t-SNE, KMeans | xong |
-| E2 | Tiền xử lý, tạo và chọn feature | 04 | bộ feature `A_lr_v2` (0,95974), `A_lgb_v2` (0,96089); ghép dòng gốc 18/10 | "bậc thang" từ LR baseline 0,9217: mỗi bậc thêm một bước, tới bộ feature thật | chưa |
+| E2 | Tiền xử lý, tạo và chọn feature | 04 | bộ feature `A_lr` (0,95974), `A_lgb` (0,96089); ghép dòng gốc 18/10 | "bậc thang" từ LR baseline 0,9217: mỗi bậc thêm một bước, tới bộ feature thật | xong |
 | E3 | Huấn luyện, so sánh mô hình | 07, 08 | LGB, LR, KNN, TabM, FM, FT-T, TabPFN, Q-FT, mô hình ngôn ngữ | DT, RF, Naive Bayes, SVM, MLP; bias / variance; learning curve | chưa |
 | E4 | Tinh chỉnh siêu tham số | 09 | dò stacker (v5), lưới hệ số họ (v16), số epoch Q-FT | Grid / Random / Bayesian (Optuna) cùng ngân sách trên LGB | chưa |
 | E5 | Kết hợp mô hình | 10 | stack chỉ model của nhóm (0,96162, 25 model), stack với pool công khai, FWLS, Q-FT qua cổng | averaging, weighted, rank, blending, stacking trên member của nhóm | chưa |

@@ -10,12 +10,12 @@ Phần **tái lập thật** nằm ở:
 | Tái lập | Ở đâu | Kết quả |
 | --- | --- | --- |
 | File nộp slot 1 (private 0,96239) từ các phần đã lưu | `reproduce_final.py` | trùng từng byte với file đã nộp (cùng md5) |
-| Model `A_lr_v2` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/E2_preprocess.py`) | 0,959727 (chênh 1e-5) |
-| Model `A_lgb_v2` (CV khi thi 0,960893) | E2, bậc "4t, lr 0,02" (`exp/kaggle/E2_lgb.py`) | 0,960889 (chênh 4e-6) |
+| Model `A_lr` (CV khi thi 0,959737) | E2, bậc L6 của LR (`exp/E2_preprocess.py`) | 0,959727 (chênh 1e-5) |
+| Model `A_lgb` (CV khi thi 0,960893) | E2, bậc "4t, lr 0,02" (`exp/kaggle/E2_lgb.py`) | 0,960889 (chênh 4e-6) |
 
-Bản `_v1` (14–15/10) có lỗi đảo cột Flight Distance và Age khi tạo feature; ngày 18/10 sửa thành `_v2`. Code trong
-`src/features.py` là bản đã sửa, nên tái lập khớp với `_v2`. Chênh lệch còn lại đến từ số luồng (LightGBM không cho
-kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn, nhỏ hơn nhiễu giữa hai seed (Q-FT: 2,4e-5).
+Chênh lệch khi tái lập đến từ số luồng (LightGBM không cho kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn,
+nhỏ hơn nhiễu giữa hai seed (Q-FT: 2,4e-5). *Ghi chú:* số "khi thi" là bản `_v2` (18/10), sau khi sửa một lỗi đảo cột
+Flight Distance / Age ở bản đầu; `src/features.py` là bản đã sửa.
 
 ## Danh sách script
 
@@ -23,8 +23,8 @@ kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn, nh�
 
 | Script | Model | CV khi thi | Chạy ở |
 | --- | --- | --- | --- |
-| `A_lgb_fe.py` | LightGBM, bậc thang feature (nay là `src/features.py`) | `A_lgb_v1` 0,960956; `A_lgb_v2` 0,960893 | máy cá nhân |
-| `A_lr.py` | Logistic Regression trên one-hot thưa + TE trong fold + teacher gốc | `A_lr_v1` 0,959744; `A_lr_v2` 0,959737 | máy cá nhân |
+| `A_lgb_fe.py` | LightGBM, bậc thang feature (nay là `src/features.py`) | `A_lgb` 0,960893 | máy cá nhân |
+| `A_lr.py` | Logistic Regression trên one-hot thưa + TE trong fold + teacher gốc | `A_lr` 0,959737 | máy cá nhân |
 | `A_knn.py` | kNN trên không gian đặc trưng tự chọn thang | `A_knn_v2` 0,950270 | máy cá nhân |
 | `A_tabm.py` | TabM | `A_tabm_v1` 0,959541 | Kaggle GPU |
 | `A_fm.py` | Factorization Machine | `A_fm_v1` 0,957154 | máy cá nhân |
@@ -38,8 +38,8 @@ kết quả y hệt khi đổi số luồng) và phiên bản scikit-learn, nh�
 | `A_orig_teacher.py` | teacher chỉ train trên dữ liệu gốc, các cách xử lý delay | – | máy cá nhân |
 | `A_tfm_probe.py` | thử TabPFN với context lớn | `A_tabpfn_probe` 0,959990 (fold 0) | Kaggle GPU |
 
-Model của các thành viên khác được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code nằm trong notebook riêng
-của từng người.
+Model của các thành viên khác (XGBoost / CatBoost có teacher từ dữ liệu gốc, RealMLP, model chuyên khách đi việc riêng)
+được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code của các model này không lưu trong repo.
 
 **Stacking và chọn bài:**
 
