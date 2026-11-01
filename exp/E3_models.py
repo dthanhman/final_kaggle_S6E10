@@ -520,7 +520,7 @@ P.save(fig, "E3_04_rank_corr")
 # | RealMLP-TD (pytabkit, 16 epoch) | 19/10 | 0,9577, tương quan 0,926 với LightGBM | ±1×10⁻⁶ | AUC thấp, có thể do train ít epoch (chưa thử thêm) |
 # | GPT-2 phân loại dòng dạng văn bản | 19/10 | 0,9562 (5,8 giờ GPU) | −5×10⁻⁶ / −3×10⁻⁶ | dưới ngưỡng, chi phí cao |
 # | LLR: distilgpt2 sinh dòng theo nhãn, chỉ train trên dữ liệu gốc | 18/10 | 0,9515 | −3,5×10⁻⁶ đến +0,4×10⁻⁶ (stacking khi thi) | dưới ngưỡng |
-# | TabPFN (context 300 nghìn dòng) | 16/10 | 0,9600 (fold 0) | −3,9×10⁻⁶ đến −0,1×10⁻⁶ (stacking khi thi) | tương quan 0,993 với stacking; hết bộ nhớ GPU khi dùng cả 560 nghìn dòng |
+# | TabPFN: context 50–100 nghìn dòng (4 biến thể đầu vào), rồi 300 nghìn dòng có dữ liệu gốc | 15–16/10 | 0,9600 (fold 0, bản 300 nghìn) | −3,9×10⁻⁶ đến −0,1×10⁻⁶ (stacking khi thi); các bản 100 nghìn ≤ 0 | tương quan 0,993 với stacking; hết bộ nhớ GPU khi dùng cả 560 nghìn dòng |
 # | Chạy lại sạch một member công khai (LightGBM feature nghiệp vụ) | 19/10 | 0,9587 | 0 | bản sạch không giúp; phần lợi của bản gốc nhiều khả năng do early stopping trên fold đang chấm |
 # | LightGBM trọng số ×3 cho Personal Travel | 18/10 | 0,9605; AUC nhóm Personal không tăng | −1×10⁻⁶ (stacking khi thi) | không cải thiện nhóm khách khó |
 # | Dual-Specialist LightGBM (2 nhánh Personal / Business) | 18/10 | 0,9586; AUC nhóm Personal giảm từ 0,8336 xuống 0,8284 | – | không sạch (early stopping trên fold đang chấm) |
@@ -534,3 +534,4 @@ P.save(fig, "E3_04_rank_corr")
 # | RGF, Regularized Greedy Forest (`A_alt_trees.py`) | 18–19/10 | – | – | sau 4 giờ chưa xong fold 0 (máy hết RAM); dừng |
 # | TabDPT, foundation model truy xuất 2.048 dòng làm context (`A_tabdpt_probe.py`) | 19/10 | 0,9529 (fold 0) | −2,8×10⁻⁶ đến −1,1×10⁻⁵ (stacking khi thi) | không giúp |
 # | OOF công khai mới: LightGBM + target encoding 4 khoá; TabM (pytabkit) | 26–27/10 | 0,9604 / 0,9605 | −1,7×10⁻⁶ đến +0,8×10⁻⁶ (stacking khi thi) | không thêm thông tin; cả hai early stopping trên fold đang chấm |
+# | RealMLP-TD tự chạy lại (bỏ label smoothing, chọn epoch theo cross-entropy, batch 1024 / 32 epoch và 256 / 64 epoch; `A_realmlp.py`) | 19/10 | 0,95781 / 0,95798 (fold 0) so với 0,95787 của bản cũ | – | không tốt hơn; dừng, không chạy đủ 5 fold |

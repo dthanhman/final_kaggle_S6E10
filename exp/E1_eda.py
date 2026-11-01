@@ -638,6 +638,9 @@ P.save(fig, "E1_12_original_vs_train")
 #   thi và dữ liệu gốc phụ thuộc vào số token khi tách giá trị đó bằng tokenizer GPT-2 (R² = 0,69, so với 0,002 ở phép
 #   đối chứng). Kết quả này gợi ý dữ liệu được sinh bằng một model dùng tokenizer GPT-2, và là lý do nhóm thử các
 #   model LLR và GPT-2 ở E3.
+# - *Trong cuộc thi (19/10).* Nhóm kiểm tra nhãn và phần dư của stacking có tương quan theo thứ tự `id` không (dòng
+#   liền kề có giống nhau hơn ngẫu nhiên không, tức dữ liệu có được sinh theo lô). Mọi độ trễ đều nằm trong ±0,0012,
+#   không có tín hiệu, nên thứ tự `id` không được dùng làm feature.
 
 # %% [markdown]
 # ## 9. Tóm tắt và hàm ý cho tiền xử lý (E2)

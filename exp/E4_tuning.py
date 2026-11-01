@@ -10,10 +10,13 @@
 # >
 # > | Ngày | Tinh chỉnh | Cách dò | Kết quả | Quyết định |
 # > | --- | --- | --- | --- | --- |
+# > | 15/10 | C của Logistic Regression `A_lr`: 0,01 / 0,05 / 0,2 | lưới | C = 0,05 tốt nhất | dùng C = 0,05 |
+# > | 16/10 | stacker: bỏ member gần trùng (tương quan > 0,999); stacker riêng theo `Type of Travel` (bản v3) | 3 meta seed | đều âm (theo `Type of Travel`: −7×10⁻⁶ đến −1×10⁻⁵) | bỏ cả hai |
 # > | 16/10 | stacker: 6 mức C của LR × 3 cấu hình LightGBM × tỉ lệ trộn 0–0,4 (bản v5) | lưới, 3 meta seed | mọi cấu hình trong ±1×10⁻⁶ so với nền | giữ nền |
 # > | 18/10 | ngưỡng cắt logit ±9,2 / ±13,8 / ±20,7 (bản v8) | lưới, 3 seed | ±0,2×10⁻⁶; riêng ±9,2 giảm 2×10⁻⁶ | không ảnh hưởng |
 # > | 20/10 | FWLS, tức hệ số của stacker thay đổi theo nhóm khách (bản v13) | lưới 3 mức, 3 seed | tốt nhất +1,8×10⁻⁶ đến +3,5×10⁻⁶ | dưới cổng, dừng tối ưu stacker |
 # > | 22/10 | hệ số nhân theo họ model trong LR (TabPFN 2/3/4,5; foundation model khác 1/1,5/2,5; MLP 0,7/1/1,5; bản v16) | lưới 27 điểm, 3 seed | tốt nhất +0,5×10⁻⁶ đến +1,4×10⁻⁶ | dưới cổng |
+# > | 22/10 | tỉ trọng LightGBM trong stacker, W từ 0 đến 0,4 (bản v15) | lưới, 3 seed | W = 0,2 tốt nhất; bỏ hẳn LightGBM giảm 1,1×10⁻⁵ đến 1,7×10⁻⁵ (14/15 fold) | giữ W = 0,2 |
 # > | 25/10 | số epoch fine-tune của Q-FT, 2 hay 4 (Q-FT v3) | thử trực tiếp | thấp hơn ở 5/5 fold | giữ 2 epoch |
 # > | 25/10 | hệ số của Q-FT trong stacker ×1 / ×1,5, một seed hay trung bình 2 seed (bản v17) | lưới, 3 seed | ×1,5 với seed 42: +6×10⁻⁶ đến +8×10⁻⁶, 14/15 fold | qua cổng, dùng cho bài nộp |
 # >
@@ -230,6 +233,9 @@ imp.round(3)
 # | Stacker: lưới C của LR × cấu hình LightGBM × tỉ lệ trộn (v5) | 16/10 | ±1×10⁻⁶ | – | dưới nhiễu |
 # | Stacker: XGBoost với mục tiêu xếp hạng `rank:pairwise` (v6) | 16/10 | −0,3×10⁻⁶ (trộn 0,1); −4,2×10⁻⁵ (dùng riêng) | 7/15 | không giúp |
 # | Stacker: ngưỡng cắt logit (v8) | 18/10 | ±0,2×10⁻⁶ | – | không ảnh hưởng |
+# | Stacker: đầu vào rank + logit; ràng buộc trọng số ≥ 0; tối ưu trực tiếp AUC theo cặp (v9) | 18–19/10 | −2,2×10⁻⁵; −1,7×10⁻⁴; ≈ 0 | – | không giúp |
+# | Stacker: elastic-net (L1 + L2); loss theo cặp không ràng buộc (v11) | 19/10 | −1,7×10⁻⁵ đến −9,3×10⁻⁵; −3×10⁻⁶ đến −4,9×10⁻⁵ | 0–2/15 | không giúp |
+# | Stacker: bỏ member gần trùng (ρ > 0,999) và stacker riêng theo `Type of Travel` (v3) | 16/10 | âm; −7×10⁻⁶ đến −1×10⁻⁵ | – | không giúp |
 # | Stacker: FWLS theo nhóm khách (v13) | 20/10 | +1,8×10⁻⁶ đến +3,5×10⁻⁶ | 11/15 | dưới cổng |
 # | Stacker: bỏ một nhóm member, thêm FWLS và RealMLP (v14) | 20/10 | +3,5×10⁻⁶ đến +5,7×10⁻⁶ | 12/15 | không qua cổng ở cả 3 seed |
 # | Stacker: lưới hệ số theo họ model (v16, 27 điểm) | 22/10 | +0,5×10⁻⁶ đến +1,4×10⁻⁶ | 8/15 | dưới cổng |

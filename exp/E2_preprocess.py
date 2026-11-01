@@ -563,3 +563,9 @@ P.save(fig, "E2_01_ladder")
 # | Mọi nhánh điền thiếu, cắt ngoại lệ, chuẩn hoá (cả hai model) | kiểm chứng | ±5×10⁻⁵ | không nhất quán | dữ liệu thiếu rất ít; cây không nhạy |
 # | Bỏ 5 cột yếu nhất theo AUC một cột | kiểm chứng | −0,0014 | 0/5 | cột yếu riêng lẻ vẫn có ích khi kết hợp |
 # | Teacher xử lý chỗ lệch delay: bỏ hai cột delay, chỉ dùng dòng gốc có delay = 0, hoặc đặt trọng số theo adversarial validation (`A_orig_teacher.py`) | 15/10 | AUC của teacher tăng từ 0,95441 lên 0,95459–0,95471; vào stacking giảm 1×10⁻⁶ đến 5×10⁻⁶ | – | teacher tốt hơn khi đứng riêng nhưng không thêm thông tin cho stacking |
+# | Thống kê theo tuyến bay, coi mỗi giá trị `Flight Distance` là một tuyến: trung bình điểm / tuổi / delay theo tuyến, độ lệch của khách so với trung bình, tỉ lệ category trong tuyến (`--extra route`) | 13/10 | không tăng | – | lúc đó do lỗi đảo cột nên feature thực chất tính theo Age; sau khi sửa (16/10) vẫn không thêm thông tin cho stacking |
+# | Teacher kNN: tỉ lệ hài lòng của 10 / 50 khách giống nhất trong dữ liệu gốc (`--extra knn`) | 14/10 | −1×10⁻⁶ so với bậc 4 + teacher | 3/5 | dưới nhiễu |
+# | Khoảng cách tới khách gần nhất / trung bình 10 khách gần nhất trong dữ liệu gốc (`--extra dist`) | 14/10 | −1,1×10⁻⁵ | 2/5 | không giúp |
+# | log(tần suất trong dữ liệu cuộc thi / tần suất trong dữ liệu gốc) theo từng cột và vài tổ hợp (`--extra shift`) | 14/10 | ≈ 0 | – | dưới nhiễu |
+# | Tự sinh a + b, a − b, a × b, a / (b + 1) cho mọi cặp trong 10 cột quan trọng, 180 cột (`--extra arith`) | 14/10 | +3×10⁻⁶ | – | dưới nhiễu |
+# | Thêm một bản LightGBM learning rate 0,02 vào stacking các bản LightGBM (`stack_lgb_v2`) | 14/10 | +5×10⁻⁶ | – | các bản trong stacking đã có teacher; không nộp |

@@ -44,6 +44,14 @@ Flight Distance / Age ở bản đầu; `src/features.py` là bản đã sửa.
 | `A_tabdpt_probe.py` | thử TabDPT (foundation model truy xuất context) | 0,952949 (fold 0) | Kaggle GPU |
 | `A_alt_trees.py` | model cây khác loại: EBM, YDF split xiên, RGF | EBM 0,9546, YDF 0,9565 (fold 0, 100 nghìn dòng) | máy cá nhân |
 | `A_llm_fingerprint.py` | kiểm tra dữ liệu có phải do language model (tokenizer GPT-2) sinh ra | – | máy cá nhân |
+| `A_realmlp.py` | chạy lại RealMLP-TD với cấu hình khác (bỏ label smoothing, chọn epoch theo cross-entropy) | 0,95798 (fold 0) | Kaggle GPU |
+| `A_residual.py` | LightGBM học phần dư từ logit stacking với từng nhóm feature | mọi nhóm ≤ 0 | máy cá nhân |
+| `A_slices.py` | tìm nhóm khách bị stacking dự đoán lệch (27 nghìn nhóm 1–2 cột) | không nhóm nào lệch rõ | máy cá nhân |
+| `A_confident_errors.py` | lỗi ở vùng dự đoán tự tin có đoán được từ feature không | −1,4×10⁻⁶ | máy cá nhân |
+| `A_neardup.py` | dòng gần trùng (khớp mọi cột trừ 1) có nhãn giống nhau hơn dự đoán không | ±0 | máy cá nhân |
+| `A_probe_replace.py` | thay member công khai cũ bằng bản chạy lại | dẫn tới biến thể `drop_gpold` của v10 | máy cá nhân |
+| `A_stack_v9_exp.py`, `A_stack_v11_exp.py`, `A_stack_v15_exp.py` | biến thể stacker: rank + logit, trọng số ≥ 0, AUC trực tiếp (v9); elastic-net, loss theo cặp (v11); tỉ trọng LightGBM (v15) | E4 | Kaggle CPU |
+| `A_teacher_swap.py` | đổi teacher trong công thức blend của bài nộp | phụ thuộc hướng, không dùng | máy cá nhân |
 
 Model của các thành viên khác (XGBoost / CatBoost có teacher từ dữ liệu gốc, RealMLP, model chuyên khách đi việc riêng)
 được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code chép nguyên văn từ repo làm việc cũ vào `exp/competition/code/members/` (xem README ở đó: nguồn commit, cách làm từng model). Đã kiểm tra: XGBoost / CatBoost và RealMLP sạch (early stopping trên 10% tách từ phần train của fold); Dual-Specialist LightGBM dừng sớm trên fold đang chấm nên không đưa vào stack ở E3.
