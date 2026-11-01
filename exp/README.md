@@ -33,7 +33,7 @@ rò rỉ dữ liệu, overfit public LB...). Mục cuối E6 tổng hợp bài h
 | E1 | Kiểm tra dữ liệu (EDA) | 03, 06 | EDA 12–13/10, so sánh dữ liệu gốc 15/10 | thêm IQR / z-score, giá trị thiếu, PCA, t-SNE, KMeans | xong |
 | E2 | Tiền xử lý, tạo và chọn feature | 04 | bộ feature `A_lr` (0,95974), `A_lgb` (0,96089); ghép dòng gốc 18/10 | "bậc thang" từ LR baseline 0,9217: mỗi bậc thêm một bước, tới bộ feature thật | xong |
 | E3 | Huấn luyện, so sánh mô hình | 07, 08 | LGB, LR, KNN, TabM, FM, FT-T, TabPFN, Q-FT, mô hình ngôn ngữ | DT, RF, Naive Bayes, SVM, MLP; bias / variance; learning curve | xong |
-| E4 | Tinh chỉnh siêu tham số | 09 | dò stacker (v5), lưới hệ số họ (v16), số epoch Q-FT | Grid / Random / Bayesian (Optuna) cùng ngân sách trên LGB | chưa |
+| E4 | Tinh chỉnh siêu tham số | 09 | dò stacker (v5), lưới hệ số họ (v16), số epoch Q-FT | Grid / Random / Bayesian (Optuna) cùng ngân sách trên LGB | xong |
 | E5 | Kết hợp mô hình | 10 | stack chỉ model của nhóm (0,96162, 25 model), stack với pool công khai, FWLS, Q-FT qua cổng | averaging, weighted, rank, blending, stacking trên member của nhóm | chưa |
 | E6 | Đánh giá cuối, chọn bài nộp | 05, 11 | 36 bài nộp, chọn 2 slot, public và private | ROC, AUC theo nhóm khách, lỗi tự tin; nhiễu public LB | chưa |
 | E7 | Triển khai (tuỳ chọn) | 11 | – | demo Streamlit | chưa |
