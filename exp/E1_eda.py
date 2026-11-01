@@ -633,6 +633,11 @@ P.save(fig, "E1_12_original_vs_train")
 #   4,3%). Chỉ 17 dòng train trùng hệt một dòng gốc, tức bộ sinh dữ liệu không sao chép dòng.
 # - Vì vậy nếu ghép dữ liệu gốc vào huấn luyện thì phải lưu ý cột delay, chỉ thêm vào phần train của fold (không bao
 #   giờ vào fold validation), và quyết định giữ hay bỏ bằng CV (E2).
+# - *Trong cuộc thi (17/10).* Nhóm kiểm tra thêm dữ liệu cuộc thi có phải do một language model sinh ra hay không
+#   (`exp/competition/code/A_llm_fingerprint.py`). Tỉ lệ tần suất của một giá trị `Flight Distance` giữa dữ liệu cuộc
+#   thi và dữ liệu gốc phụ thuộc vào số token khi tách giá trị đó bằng tokenizer GPT-2 (R² = 0,69, so với 0,002 ở phép
+#   đối chứng). Kết quả này gợi ý dữ liệu được sinh bằng một model dùng tokenizer GPT-2, và là lý do nhóm thử các
+#   model LLR và GPT-2 ở E3.
 
 # %% [markdown]
 # ## 9. Tóm tắt và hàm ý cho tiền xử lý (E2)

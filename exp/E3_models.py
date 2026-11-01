@@ -528,4 +528,9 @@ P.save(fig, "E3_04_rank_corr")
 # | Q-FT v3 (fine-tune 4 epoch) | 25/10 | 0,9593, thấp hơn v2 ở 5/5 fold | – | AUC giảm ở epoch 4 (overfit) |
 # | Q-FT v4 (bỏ teacher LightGBM khỏi token) | 25/10 | 0,9610, thấp hơn v2 ở 4/5 fold | −0,9×10⁻⁶ đến −0,2×10⁻⁶ | không khác biệt hơn v2 |
 # | Cây quyết định không giới hạn độ sâu | kiểm chứng | 0,8641 (train 1,0) | – | overfit |
-# | Naive Bayes Gaussian / categorical | kiểm chứng | 0,9100 / 0,9309 | – | giả thiết độc lập sai: các cột điểm tương quan mạnh |
+# | Naive Bayes Gaussian / categorical | kiểm chứng | 0,9100 / 0,9309 | – | giả thiết độc lập không đúng vì các cột điểm tương quan mạnh |
+# | EBM, Explainable Boosting Machine (`A_alt_trees.py`) | 18/10 | 0,9546 (fold 0, train trên 100 nghìn dòng) | – | chạy đủ dữ liệu quá chậm (21 phút cho 100 nghìn dòng); dừng |
+# | YDF với split xiên (`A_alt_trees.py`) | 18/10 | 0,9565 (fold 0, 100 nghìn dòng) | – | hết RAM khi chạy đủ dữ liệu; dừng |
+# | RGF, Regularized Greedy Forest (`A_alt_trees.py`) | 18–19/10 | – | – | sau 4 giờ chưa xong fold 0 (máy hết RAM); dừng |
+# | TabDPT, foundation model truy xuất 2.048 dòng làm context (`A_tabdpt_probe.py`) | 19/10 | 0,9529 (fold 0) | −2,8×10⁻⁶ đến −1,1×10⁻⁵ (stacking khi thi) | không giúp |
+# | OOF công khai mới: LightGBM + target encoding 4 khoá; TabM (pytabkit) | 26–27/10 | 0,9604 / 0,9605 | −1,7×10⁻⁶ đến +0,8×10⁻⁶ (stacking khi thi) | không thêm thông tin; cả hai early stopping trên fold đang chấm |

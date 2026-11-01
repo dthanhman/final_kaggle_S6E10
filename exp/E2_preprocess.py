@@ -562,3 +562,4 @@ P.save(fig, "E2_01_ladder")
 # | LR: PCA 5 thành phần | kiểm chứng | ≈ 0 | 3/5 | biến đổi tuyến tính, LR tự làm được |
 # | Mọi nhánh điền thiếu, cắt ngoại lệ, chuẩn hoá (cả hai model) | kiểm chứng | ±5×10⁻⁵ | không nhất quán | dữ liệu thiếu rất ít; cây không nhạy |
 # | Bỏ 5 cột yếu nhất theo AUC một cột | kiểm chứng | −0,0014 | 0/5 | cột yếu riêng lẻ vẫn có ích khi kết hợp |
+# | Teacher xử lý chỗ lệch delay: bỏ hai cột delay, chỉ dùng dòng gốc có delay = 0, hoặc đặt trọng số theo adversarial validation (`A_orig_teacher.py`) | 15/10 | AUC của teacher tăng từ 0,95441 lên 0,95459–0,95471; vào stacking giảm 1×10⁻⁶ đến 5×10⁻⁶ | – | teacher tốt hơn khi đứng riêng nhưng không thêm thông tin cho stacking |

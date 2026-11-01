@@ -41,6 +41,9 @@ Flight Distance / Age ở bản đầu; `src/features.py` là bản đã sửa.
 | `A_lgb_origrow.py` | LightGBM ghép thêm dòng dữ liệu gốc vào phần train của fold | 0,959729 (đối chứng 0,959630) | máy cá nhân |
 | `A_orig_teacher.py` | teacher chỉ train trên dữ liệu gốc, các cách xử lý delay | – | máy cá nhân |
 | `A_tfm_probe.py` | thử TabPFN với context lớn | `A_tabpfn_probe` 0,959990 (fold 0) | Kaggle GPU |
+| `A_tabdpt_probe.py` | thử TabDPT (foundation model truy xuất context) | 0,952949 (fold 0) | Kaggle GPU |
+| `A_alt_trees.py` | model cây khác loại: EBM, YDF split xiên, RGF | EBM 0,9546, YDF 0,9565 (fold 0, 100 nghìn dòng) | máy cá nhân |
+| `A_llm_fingerprint.py` | kiểm tra dữ liệu có phải do language model (tokenizer GPT-2) sinh ra | – | máy cá nhân |
 
 Model của các thành viên khác (XGBoost / CatBoost có teacher từ dữ liệu gốc, RealMLP, model chuyên khách đi việc riêng)
 được nhận dưới dạng file OOF / test trên cùng `folds.csv`; code chép nguyên văn từ repo làm việc cũ vào `exp/competition/code/members/` (xem README ở đó: nguồn commit, cách làm từng model). Đã kiểm tra: XGBoost / CatBoost và RealMLP sạch (early stopping trên 10% tách từ phần train của fold); Dual-Specialist LightGBM dừng sớm trên fold đang chấm nên không đưa vào stack ở E3.
