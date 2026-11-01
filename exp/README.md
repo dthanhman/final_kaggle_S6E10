@@ -7,7 +7,7 @@ như vậy:
 | Vòng | Thời gian | Nội dung | Kết quả | Đạt top 5%? |
 | --- | --- | --- | --- | --- |
 | 1 | 12–14/10 | EDA, tạo feature, LightGBM đơn | CV 0,96096, public 0,96061 | chưa (ngưỡng ≈ 0,9619) |
-| 2 | 15–19/10 | mô hình khác loại (LR, KNN, TabM, FM, FT-Transformer, TabPFN, mô hình ngôn ngữ) | stack chỉ model của nhóm: 0,96121 (10 model, 19/10); đầy đủ 25 model gồm Q-FT, B, quan: 0,96162 | chưa |
+| 2 | 15–19/10 | mô hình khác loại (LR, KNN, TabM, FM, FT-Transformer, TabPFN, mô hình ngôn ngữ) | stack chỉ gồm model nhóm tự train: 0,96121 (10 model, 19/10); đủ 25 model của cả 3 thành viên, gồm Q-FT: 0,96162 | chưa |
 | 3 | 15–25/10 | stacking với bộ OOF công khai, Q-FT tự viết | CV 0,962224 | gần |
 | 4 | 25–31/10 | chọn 2 bài nộp, đối chiếu public / private | private 0,96239, hạng 66 / ~3748 | đạt |
 
