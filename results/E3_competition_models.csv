@@ -1,0 +1,14 @@
+họ,model đại diện,ngày,số file,cv_auc,rank_corr_lgb,trong stack,delta_stack_folds,delta_stack_seed7
+LightGBM + feature (E2),LightGBM bậc 4 + teacher (bản sửa lỗi FD/Age),18/10,5,0.960893,1.0,có,-5.1e-05,-5.1e-05
+XGBoost / CatBoost dùng dữ liệu gốc (teacher hoặc ghép dòng),CatBoost + 2 teacher gốc,17/10,4,0.960941,0.9804,có,-2.7e-05,-2.5e-05
+LightGBM feature nghiệp vụ (chạy lại member công khai),LightGBM feature nghiệp vụ + prior gốc,19/10,3,0.958661,0.943,có,0.0,0.0
+"Logistic Regression (one-hot thưa, E2)",LR one-hot thưa (L6),18/10,2,0.959737,0.9594,có,-1.1e-05,-7e-06
+LR + token GPT-2 của chuỗi số,LR + token GPT-2,18/10,1,0.959867,0.9587,có,-1.6e-05,-1.6e-05
+kNN,kNN k=50,18/10,2,0.95027,0.8668,có,1e-06,6e-06
+Factorization Machine,FM dim 16,18/10,1,0.957154,0.929,có,-1e-06,1e-06
+TabM,TabM,15/10,1,0.959541,0.9459,có,4e-06,4e-06
+FT-Transformer,FT-Transformer d64 3 lớp,18/10,1,0.96005,0.966,có,5e-06,5e-06
+"RealMLP-TD (pytabkit, 16 epoch, + 6 feature tổng hợp)","RealMLP-TD, batch 2048",19/10,1,0.957695,0.9264,có,-0.0,1e-06
+GPT-2 phân loại dòng dạng văn bản,GPT-2 phân loại,19/10,1,0.956221,0.9145,có,-5e-06,-3e-06
+"Q-FT (transformer tự viết, tiền huấn luyện RTD)",Q-FT v2 (seed 42),25/10,3,0.961091,0.9659,có,-0.000225,-0.000222
+LightGBM 2 nhánh Personal / Business Travel (dừng sớm trên fold đang chấm),Dual-Specialist LightGBM,–,1,0.958643,0.9385,không (không sạch),,

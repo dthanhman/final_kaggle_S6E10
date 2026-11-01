@@ -1,0 +1,8 @@
+model,family,cv_auc,fold_mean,fold_std,fold_0,fold_1,fold_2,fold_3,fold_4,train_auc,minutes,train_minus_cv,notes
+naive_bayes_gauss,Naive Bayes,0.909998,0.909998,0.000839,0.91105,0.909798,0.909985,0.910583,0.908572,0.909988,0.1,-1e-05,GaussianNB trên 21 cột mã số
+naive_bayes_cat,Naive Bayes,0.930901,0.9309,0.000376,0.931563,0.930436,0.930962,0.930857,0.930683,0.930985,0.2,8.5e-05,"CategoricalNB, cột số chia 20 khoảng phân vị"
+logistic_regression,tuyến tính,0.948675,0.948678,0.000495,0.949089,0.94785,0.949273,0.948566,0.948608,0.948901,0.5,0.000223,dạng L1 của E2
+linear_svm,SVM,0.947626,0.947628,0.000475,0.948024,0.946861,0.948225,0.947478,0.947554,0.947847,1.1,0.000219,"hinge loss, dạng L1"
+rbf_svm,SVM,0.951787,0.951785,0.000548,0.951665,0.950778,0.952336,0.952037,0.952107,0.952301,5.6,0.000516,"RBF xấp xỉ Nyström 500, fit trên 200 nghìn dòng mỗi fold"
+decision_tree,cây đơn,0.951289,0.95128,0.0006,0.951255,0.950176,0.951915,0.951357,0.951696,0.954953,0.3,0.003673,max_depth=10 (tốt nhất ở mục 2.1)
+decision_tree_full,cây đơn,0.864123,0.864123,0.001135,0.863904,0.862357,0.865677,0.86372,0.864959,1.0,0.5,0.135877,không giới hạn độ sâu
