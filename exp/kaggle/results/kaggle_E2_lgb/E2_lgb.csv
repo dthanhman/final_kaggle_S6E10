@@ -1,0 +1,19 @@
+group,variant,cv_auc,fold_mean,fold_std,fold_0,fold_1,n_features,trees_mean,minutes,notes,delta_cv,folds_up
+ladder,0 cột gốc,0.950737,0.951676,0.003472,0.955149,0.948204,21,45,0.0,so với bậc liền trước,,
+ladder,1 + chữ số,0.948974,0.950815,0.003035,0.95385,0.94778,37,39,0.0,so với bậc liền trước,-0.001763,0.0
+ladder,2 + tần suất,0.950128,0.951743,0.002724,0.954467,0.949018,54,45,0.0,so với bậc liền trước,0.001154,2.0
+ladder,3 + TE trong fold,0.949861,0.951128,0.003201,0.954329,0.947928,136,38,0.0,so với bậc liền trước,-0.000267,0.0
+ladder,4 + dữ liệu gốc,0.94956,0.953857,0.003645,0.957502,0.950213,168,31,0.0,so với bậc liền trước,-0.000301,2.0
+ladder,4t + 3 teacher gốc,0.954827,0.95516,0.002743,0.957902,0.952417,171,50,0.0,so với bậc liền trước,0.005267,2.0
+ladder,5 + tra cứu bộ điểm,0.95392,0.95402,0.002998,0.957017,0.951022,183,49,0.0,so với bậc liền trước,0.00436,1.0
+ladder,6 + feature nghiệp vụ,0.949954,0.952742,0.003966,0.956707,0.948776,198,30,0.0,so với bậc liền trước,-0.003966,0.0
+final,"4t, lr 0,02 (= A_lgb_v1)",0.949022,0.952916,0.002226,0.955142,0.95069,171,31,0.0,"so với 4t lr 0,05; khi thi 0,960956",-0.005805,0.0
+branch,missing_fill_dep,0.950769,0.951697,0.003451,0.955149,0.948246,21,45,0.0,"so với bậc 0 (NaN để nguyên, category native)",3.2e-05,1.0
+branch,missing_median,0.950737,0.951676,0.003472,0.955149,0.948204,21,45,0.0,"so với bậc 0 (NaN để nguyên, category native)",0.0,0.0
+branch,missing_flag,0.951373,0.951806,0.003343,0.955149,0.948464,22,44,0.0,"so với bậc 0 (NaN để nguyên, category native)",0.000636,1.0
+branch,delay_log1p,0.950737,0.951676,0.003472,0.955149,0.948204,21,45,0.0,"so với bậc 0 (NaN để nguyên, category native)",0.0,0.0
+branch,delay_clip_q99,0.950328,0.95188,0.003455,0.955336,0.948425,21,43,0.0,"so với bậc 0 (NaN để nguyên, category native)",-0.00041,2.0
+branch,scale_standard,0.950379,0.951914,0.003249,0.955163,0.948665,21,43,0.0,"so với bậc 0 (NaN để nguyên, category native)",-0.000358,2.0
+branch,cat_ordinal,0.950272,0.951706,0.003364,0.955069,0.948342,21,44,0.0,"so với bậc 0 (NaN để nguyên, category native)",-0.000466,1.0
+branch,cat_onehot,0.949512,0.951772,0.003052,0.954825,0.94872,26,42,0.0,"so với bậc 0 (NaN để nguyên, category native)",-0.001226,1.0
+branch,scores_category,0.950297,0.950706,0.003408,0.954114,0.947298,21,49,0.0,"so với bậc 0 (NaN để nguyên, category native)",-0.000441,0.0

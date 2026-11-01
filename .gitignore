@@ -25,3 +25,6 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# Bản gộp để đẩy Kaggle
+exp/kaggle/build/
