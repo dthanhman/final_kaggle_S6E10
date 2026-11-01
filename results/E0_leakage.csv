@@ -1,0 +1,6 @@
+kiểu,biến thể,CV trên dev,AUC fold 4 (thật),CV − thật
+(a) target encoding,không TE (21 cột gốc),0.9581027968342287,0.9589857533654825,-0.000882956531253809
+(a) target encoding,TE bẩn (tính trên toàn dev),0.9934505199837511,0.9081677714662725,0.08528274851747863
+(a) target encoding,TE sạch (tính trong fold),0.9577820378226558,0.9588051359762468,-0.0010230981535910288
+(b) early stopping,ES bẩn (dừng theo fold đang chấm),0.9583111374181278,0.9590339561536038,-0.0007228187354759719
+(b) early stopping,ES sạch (tách 10% từ phần train),0.9581240104665408,0.9590511815229124,-0.000927171056371523

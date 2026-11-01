@@ -1,0 +1,5 @@
+cột,Q1,Q3,IQR,cận dưới,cận trên,ngoại lệ IQR,ngoại lệ |z|>3,tỉ lệ hài lòng ở ngoại lệ IQR,max
+Age,27.0,50.0,23.0,-7.5,84.5,0.00%,0.00%,0.5,85.0
+Flight Distance,631.0,1814.0,1183.0,-1143.5,3588.5,3.27%,0.03%,0.814,4983.0
+Departure Delay in Minutes,0.0,0.0,0.0,0.0,0.0,9.22%,2.05%,0.4,489.0
+Arrival Delay in Minutes,0.0,0.0,0.0,0.0,0.0,8.43%,2.12%,0.351,491.0

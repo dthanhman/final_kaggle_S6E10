@@ -1,0 +1,2 @@
+variant,cv_auc,fold_mean,fold_std,fold_0,fold_1,fold_2,fold_3,fold_4,seconds,notes
+lr_baseline,0.921725,0.921724,0.000421,0.922563,0.921549,0.921539,0.92146,0.921509,10.2,LR + one-hot + z-score + log1p delay; baseline cho E2/E3

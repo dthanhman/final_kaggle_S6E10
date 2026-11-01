@@ -1,0 +1,22 @@
+feature,auc,chiều
+Online boarding,0.8403949917282508,+
+Class,0.7822033864960436,+
+Inflight entertainment,0.744527588647043,+
+Seat comfort,0.7321227917185155,+
+Type of Travel,0.7027487327434201,+
+On-board service,0.6993297019519294,+
+Flight Distance,0.6955851917545588,+
+Cleanliness,0.6893827793783831,+
+Leg room service,0.6876970221119338,+
+Inflight wifi service,0.662663606362291,+
+Baggage handling,0.6549059424852325,+
+Checkin service,0.6355262415319246,+
+Age,0.6243594098482097,+
+Food and drink,0.6211015721411755,+
+Ease of Online booking,0.6090343075986304,+
+Customer Type,0.5861616550055919,+
+Departure/Arrival time convenient,0.5265378486479404,−
+Arrival Delay in Minutes,0.5162363725520132,−
+Gate location,0.5136898693145292,+
+Departure Delay in Minutes,0.5085266764095451,−
+Gender,0.5056202307382316,+

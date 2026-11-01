@@ -1,0 +1,22 @@
+,kiểu,nhóm,số giá trị khác nhau,thiếu (train),thiếu (test),ví dụ
+Gender,object,category,2,0,0,Female
+Customer Type,object,category,2,0,0,Loyal Customer
+Type of Travel,object,category,2,0,0,Personal Travel
+Class,object,category,3,0,0,Eco
+Inflight wifi service,int64,điểm 0-5,6,0,0,4
+Departure/Arrival time convenient,int64,điểm 0-5,6,0,0,4
+Ease of Online booking,int64,điểm 0-5,6,0,0,4
+Gate location,int64,điểm 0-5,6,0,0,3
+Food and drink,int64,điểm 0-5,6,0,0,1
+Online boarding,int64,điểm 0-5,6,0,0,4
+Seat comfort,int64,điểm 0-5,6,0,0,1
+Inflight entertainment,int64,điểm 0-5,6,0,0,1
+On-board service,int64,điểm 0-5,6,0,0,3
+Leg room service,int64,điểm 0-5,6,0,0,4
+Baggage handling,int64,điểm 0-5,5,0,0,4
+Checkin service,int64,điểm 0-5,6,0,0,3
+Cleanliness,int64,điểm 0-5,6,0,0,1
+Age,int64,số,75,0,0,36
+Flight Distance,int64,số,3474,0,0,694
+Departure Delay in Minutes,int64,số,167,0,0,0
+Arrival Delay in Minutes,float64,số,168,292,130,0.0

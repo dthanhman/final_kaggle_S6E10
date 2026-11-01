@@ -1,0 +1,37 @@
+ref,file,date,description,public,private
+57151683,sub_stack_lgb_v1.csv,2026-10-13 17:37:31,,0.96065,0.96156
+57152012,sub_lgb_fe4_teachers.csv,2026-10-13 17:51:24,,0.96059,0.96141
+57188743,sub_A_lgb_v1.csv,2026-10-14 16:25:38,A_lgb_v1,0.96061,0.96136
+57232353,sub_stack_lr_clean_public.csv,2026-10-15 13:37:50,"stack_lr_clean_public: LR C=0.003 tren 198 OOF cong khai, nested CV 0.962170",0.96183,0.96236
+57237279,sub_stack_fw_p247.csv,2026-10-15 16:23:38,,0.96184,0.96239
+57295877,sub_track3_fw_p247_x_96183_w03.csv,2026-10-17 04:57:18,track3: rank 0.7 stack_fw_p247 + 0.3 public 0.96183,0.96186,0.96238
+57301163,submission_quan_power_v3.csv,2026-10-17 07:25:00,,0.96048,0.9614
+57347420,sub_cs116_llr_xgb_v1.csv,2026-10-18 08:53:36,,0.9581,0.95895
+57347932,sub_team_stack_v2.csv,2026-10-18 09:08:19,,0.96068,0.96157
+57347957,sub_final_p247_team_blend_w05.csv,2026-10-18 09:08:59,,0.96184,0.96238
+57347976,sub_final_p247_team_blend_w15.csv,2026-10-18 09:09:28,,0.96179,0.96236
+57350020,sub_case3_both_models_blend_w10.csv,2026-10-18 10:13:39,,0.96181,0.96237
+57350132,sub_case3_both_models_blend_w15.csv,2026-10-18 10:17:36,,0.96179,0.96236
+57376357,sub_track3_v10_drop_forge_x_96183_w03.csv,2026-10-19 01:19:53,track3 v2: 0.7 rank(stack_v10_drop_forge) + 0.3 rank(public 0.96183),0.96185,0.96238
+57376678,sub_track3_v10_drop_both_x_96183_w03.csv,2026-10-19 01:30:47,track3 v2: 0.7 rank(stack_v10_drop_both) + 0.3 rank(public 0.96183),0.96185,0.96238
+57376735,sub_stack_v10_drop_forge.csv,2026-10-19 01:32:14,"stack_v10_drop_forge: P247 bỏ Forge, fam_C003 + 0.2 gb_v4, CV 0.962213",0.96182,0.96238
+57385147,submission.csv,2026-10-19 06:08:26,,0.96197,0.9623
+57387100,sub_hedge_fw_noforge_x_gp96197_w05.csv,2026-10-19 07:07:45,hedge: 0.5 rank(stack_fw_noforge) + 0.5 rank(goodpjw 0.96197),0.96193,0.96237
+57387113,sub_hedge_fw_noforge_x_hanif96198_w05.csv,2026-10-19 07:08:12,hedge: 0.5 rank(stack_fw_noforge) + 0.5 rank(hanif 0.96198),0.96193,0.96237
+57387164,submission_candidate_first_v7.csv,2026-10-19 07:09:53,,0.96197,0.96231
+57387294,submission_metaLR_182_only_v7.csv,2026-10-19 07:13:11,,0.9618,0.96233
+57387386,sub_hedge_fw_noforge_x_hanif96198_w03.csv,2026-10-19 07:16:25,hedge: 0.7 rank(stack_fw_noforge) + 0.3 rank(hanif 0.96198),0.9619,0.96238
+57398553,sub_super_team_p247_blend_w10.csv,2026-10-19 13:55:25,,0.96181,0.96237
+57422015,sub_slot1_stack80_kirill20.csv,2026-10-20 04:34:17,slot1: 0.8 stack_team_realmlp_fw_noforge + 0.2 Kirill 0.96206 (A_final_pair.py),0.96191,0.96239
+57422019,sub_slot2_hblend_teacher.csv,2026-10-20 04:34:26,"slot2: gated h-blend, teacher 35% = (tc+td+3*own stack)/5 (A_final_pair.py)",0.96206,0.96228
+57440136,sub_slot1_v14rm80_kirill20.csv,2026-10-20 13:37:54,slot1 v14 both_tt_rm 80 + kirill 20 (CV nen 0.962219),0.96189,0.96238
+57443489,sub_optimal7_anchor96195_blend_w05.csv,2026-10-20 15:16:12,,0.96193,0.96235
+57529366,sub_slot2_mix50_nina210.csv,2026-10-22 15:08:16,slot2 mix50: slot2_hblend_teacher + nina 0.96210,0.96209,0.96226
+57619709,sub_slot2_mix50_tabpfn.csv,2026-10-25 06:25:50,slot2 hedge: 0.9 rank mix50 + 0.1 p_tabpfn,0.96211,0.96225
+57635704,sub_stack_v17_qft15.csv,2026-10-25 16:01:42,"stack_v17_qft15: S14 + qft2 v2 seed42 LR x1.5, CV 0.962224",0.96184,0.96238
+57635800,sub_slot1_v17qft80_kirill20.csv,2026-10-25 16:04:18,slot1: 0.8 rank stack_v17_qft15 + 0.2 rank Kirill 0.96206,0.9619,0.96238
+57697172,sub_slot1_v17b80_kirill20.csv,2026-10-27 09:47:01,slot1 v17b 2-seed qft2 80 + kirill 20,0.9619,0.96239
+57721196,sub_slot2_step20_v17b.csv,2026-10-28 02:42:09,slot2 step20: rank(0.8 M213 + 0.2 slot1_v17b),0.9621,0.96228
+57721311,sub_slot2_step10_v17b.csv,2026-10-28 02:47:58,slot2 step10: rank(0.9 M213 + 0.1 slot1_v17b),0.96212,0.96225
+57722132,sub_slot2_anti10_v17b.csv,2026-10-28 03:21:00,"slot2 anti10: rank(1.1 M213 - 0.1 slot1_v17b), nguoc huong stack",0.96213,0.96219
+57840187,sub_slot2_lineage_centroid.csv,2026-10-31 13:38:36,slot2 lineage centroid: rank-mean 7 public probe files 0.96217-0.96225,0.96221,0.96218
