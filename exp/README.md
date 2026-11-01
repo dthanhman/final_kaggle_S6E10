@@ -23,6 +23,10 @@ Mỗi mục E0–E6 có ba khối:
 
 Bảng kết quả có cột **thời điểm**: ngày trong cuộc thi (ví dụ `14/10`) hoặc `kiểm chứng` (chạy sau cuộc thi).
 
+**Kết quả âm được trình bày ngang hàng với kết quả dương.** Mỗi mục E2–E6 có bảng "Đã thử nhưng không giữ" cùng định
+dạng: ý tưởng, thời điểm, Δ so với nền, số fold tăng, và **lý do không giữ** (pool đã có thông tin đó, nhỏ hơn nhiễu,
+rò rỉ dữ liệu, overfit public LB...). Mục cuối E6 tổng hợp bài học từ các kết quả âm.
+
 | Mã | Bước pipeline | Bài học | Trong cuộc thi | Thí nghiệm hệ thống | Trạng thái |
 | --- | --- | --- | --- | --- | --- |
 | E0 | Thiết lập đánh giá | 05 | `folds.csv` 12/10, luật OOF sạch 14/10, ngưỡng giữ thay đổi 18–20/10 | độ đo AUC; 3 quy trình đánh giá; đo rò rỉ (TE, early stopping) | xong |
