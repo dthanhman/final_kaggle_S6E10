@@ -1,5 +1,5 @@
 # %% [markdown]
-# # E5. Kết hợp mô hình
+# # E5. Kết hợp model
 #
 # Đây là bước Ensemble của ML pipeline (Bài 10): kết hợp dự đoán của nhiều model bằng trung bình (averaging), trung
 # bình có trọng số (weighted), trung bình thứ hạng (rank averaging), blending và stacking. Mọi phương pháp chạy trên OOF
@@ -15,7 +15,7 @@
 # > | 19/10 | chỉ model nhóm tự train (10 model) | 0,96121 | |
 # > | 19/10 | 10 model nhóm + 15 foundation model công khai | 0,96180 | nhóm thêm +0,00016 so với 15 foundation model |
 # > | 19/10 | thêm model nhóm vào pool công khai đầy đủ | ±0 | pool công khai đã chứa thông tin đó |
-# > | 25/10 | stack công khai + Q-FT ×1,5 (`stack_v17_qft15`) | 0,962224 | qua cổng 5e-6, 14/15 fold |
+# > | 25/10 | stack công khai + Q-FT ×1,5 (`stack_v17_qft15`) | 0,962224 | qua cổng, 14/15 fold |
 # >
 # > Ở E3, stacking 25 OOF sạch của nhóm đạt 0,961619. Phần dưới so sánh các cách kết hợp trên chính bộ OOF đó và trên
 # > 12 model của E3, để kiểm tra lựa chọn stacking bằng LR trên logit của nhóm.
