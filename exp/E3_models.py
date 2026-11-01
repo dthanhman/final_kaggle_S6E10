@@ -135,6 +135,26 @@ print(f"Stack LR {int(full['n_oof'])} OOF sạch của nhóm: {full['folds.csv']
 comp.sort_values("cv_auc", ascending=False).set_index("họ")
 
 # %% [markdown]
+# Mọi file OOF trong bảng đều có code trong `exp/competition/code/`, trừ `A_qft2_v2avg`: khi thi file này được tính tay
+# bằng trung bình logit của hai seed Q-FT (`A_qft2.py`, seed 42 và seed 7). Ô dưới tính lại và so với file đã dùng.
+
+# %%
+def qft2_avg(part):
+    """A_qft2_v2avg = sigmoid(trung bình logit của Q-FT seed 42 và seed 7)."""
+    a, b = (np.load(COMP_OOF / f"{part}_A_qft2_{n}.npy").astype(np.float64) for n in ("v2", "v2s7"))
+    lg = lambda p: np.log(p / (1 - p))  # noqa: E731
+    return 1 / (1 + np.exp(-(lg(a) + lg(b)) / 2))
+
+
+if (COMP_OOF / "oof_A_qft2_v2avg.npy").exists():
+    for part in ("oof", "test"):
+        old = np.load(COMP_OOF / f"{part}_A_qft2_v2avg.npy").astype(np.float64)
+        new = qft2_avg(part)
+        lg = lambda p: np.log(p / (1 - p))  # noqa: E731
+        print(f"{part}: chênh lệch logit lớn nhất {np.abs(lg(new) - lg(old)).max():.1e}")
+    print(f"AUC OOF tính lại {roc_auc_score(y, qft2_avg('oof')):.6f}")
+
+# %% [markdown]
 # **Nhận xét mục 1**
 # - **Stack 25 OOF sạch của nhóm: 0,961619** (meta fold seed 7: 0,961626), hơn LightGBM đơn của nhóm (0,960893)
 #   +0,00073 và hơn model đơn tốt nhất (Q-FT v2, 0,961091) +0,00053.
