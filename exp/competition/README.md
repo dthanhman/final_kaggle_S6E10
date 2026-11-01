@@ -5,6 +5,10 @@ của nhóm, 12–31/10/2026). Chúng được **lưu để tra cứu, không ch
 repo cũ (`notebooks/`, `oof/`, `data/public_*`), và phần lớn chạy trên Kaggle với các dataset OOF công khai hoặc GPU.
 Kết quả từng script ghi trong `results/competition_log.csv` (cột `notes` nêu tên script và kernel).
 
+Tên file theo quy ước đặt tên khi thi `<tiền tố>_<model>_<phiên bản>` (ví dụ `A_lgb_v2`, `B_realmlp_v1`,
+`quan_cat_dual_teacher_v4`): tiền tố chỉ để các thành viên gửi OOF vào chung một thư mục mà không trùng tên. Tên được
+giữ nguyên để khớp với file OOF, nhật ký và script tái lập; báo cáo ghi mọi model là của nhóm.
+
 Phần **tái lập thật** nằm ở:
 
 | Tái lập | Ở đâu | Kết quả |

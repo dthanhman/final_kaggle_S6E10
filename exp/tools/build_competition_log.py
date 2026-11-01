@@ -44,6 +44,7 @@ def build_log(old_repo):
             parts += [""] * (6 - len(parts))
             rec = dict(zip(header, parts))
             rec["notes"] = rec["notes"].strip().strip('"').replace('""', '"')
+            rec["notes"] = rec["notes"].replace("submission.csv do bạn trong nhóm nộp", "bài nộp của nhóm lúc")
             rows.append(rec)
     df = pd.DataFrame(rows)
     for c in ("cv_auc", "lb_auc"):
